@@ -5,6 +5,8 @@
 
   var max_speed = 5;
   var min_speed = 0;
+  var screen;
+  var dimensions;
 
   // **start()** creates the lines and circles and starts the simulation.
   function start() {
@@ -12,9 +14,8 @@
     // In index.html, there is a canvas tag that the game will be drawn in.
     // Grab that canvas out of the DOM.  From it, get the drawing
     // context, an object that contains functions that allow drawing to the canvas.
-    var screen = document.getElementById('bounded_circles').getContext('2d');
-
-    var dimensions = { x: screen.canvas.width, y: screen.canvas.height };
+    screen = document.getElementById('bounded_circles').getContext('2d');
+    dimensions = { x: screen.canvas.width, y: screen.canvas.height };
     
 
     // `world` holds the current state of the world.
@@ -52,27 +53,22 @@
       {
         reset(world);
       }
-      // console.log("update");
       // Update state of circles and lines.
       update(world);
 
       if (!world.player.alive) {
         printEndText("You Lose! :(", "infinity", "red", world);
         world.running = false;
-        // return;
       }
 
       if (world.circles.length == 0){
         printEndText("You Win! :)", world.time, "blue", world);
         world.running = false;
-        // return;
       }
       
-      // console.log("draw");
       // Draw circles and lines.
       draw(world, screen);
 
-      // console.log("loop");
       // Queue up the next call to tick with the browser.
       requestAnimationFrame(tick);
 
@@ -107,19 +103,6 @@
         color: "black"
       };
       world.misc.push(new Text("(Press 'R' to play again)", {x: dimensions.x/2,y: dimensions.y/2+30}, 100, font));
-
-      // screen.font="10px Verdana";
-      // screen.textAlign="center";
-      // screen.fillStyle = "black";
-      // screen.fillText("It's golf scoring - lower is better",dimensions.x/2,dimensions.y/4+30);
-      // screen.font="30px Verdana";
-      // screen.textAlign="center";
-      // screen.fillStyle = color;
-      // screen.fillText(end_text,dimensions.x/2,dimensions.y/2);
-      // screen.font="20px Verdana";
-      // screen.textAlign="center";
-      // screen.fillStyle = "black";
-      // screen.fillText("(Refresh page to play again)",dimensions.x/2,dimensions.y/2+30);
     };
 
     // Run the first game tick.  All future calls will be scheduled by
@@ -143,7 +126,6 @@
 
   // Export `start()` so it can be run by index.html
   exports.start = start;
-  // exports.menu = menu;
 
   // **update()** updates the state of the lines and circles.
   function update(world) {
@@ -250,19 +232,16 @@
 
   function updatePlayer(world) {
     world.player.update(world); //get presses
-    physics.moveBody(world.player);
-    if (world.player.center.y > world.player.floor){
-      world.player.center.y = world.player.floor;
-      world.player.velocity.y = 0;
-    }
-    if (world.player.center.y != world.player.floor) {
+    if (world.player.alive){
+      physics.moveBody(world.player);
       physics.applyGravity(world.player);
-    }
 
-    // Check for death
-    for (var i=0; i<world.circles.length; i++){
-      if (trig.distance(world.player.center, world.circles[i].center) <= (world.circles[i].radius+world.player.size.x/2)) {
-        world.player.alive = false; //we're dead!
+      // Check for death
+      for (var i=0; i<world.circles.length; i++){
+        if (trig.distance(world.player.center, world.circles[i].center) <= (world.circles[i].radius+world.player.size.x/2)) {
+          world.player.alive = false; //we're dead!
+          world.player.explode(world);
+        }
       }
     }
   };
@@ -289,7 +268,7 @@
     this.mass = 1;
     this.gravity = 0.06;
     this.air_resist = 0.0005;
-
+    this.floor = 100000; //larger number so that the circle is allowed to intersect the floor. this is how we detect collisions
   };
 
   Circle.prototype = {
@@ -316,8 +295,9 @@
         var velocity = matrix.multiply(direction, speed);
         var position = { x: this.center.x, y: this.center.y }; //matrix.add(matrix.multiply(direction, this.radius), this.center);
         var lifespan = Math.random() *90 + 30; //40 - 240 ticks
+        var color = "green";
         // console.log("Debris:",i, velocity)
-        world.misc.push(new Debris(position, velocity, lifespan));
+        world.misc.push(new Debris(position, velocity, lifespan, color));
 
         if (Math.random() > 0.95)
         {
@@ -349,22 +329,14 @@
     };
   };
 
-  // // **isCircleInWorld()** returns true if `circle` is on screen.
-  // function isCircleInWorld(circle, worldDimensions) {
-  //   return circle.center.x > -circle.radius &&
-  //     circle.center.x < worldDimensions.x + circle.radius &&
-  //     circle.center.y > -circle.radius &&
-  //     circle.center.y < worldDimensions.y + circle.radius;
-  // };
-
   // ------
 
   // **new Player()** creates a player.
   var Player = function(gameSize) {
     this.gameSize = gameSize;
     this.size = { x: 15, y: 15 };
-    this.center = { x: gameSize.x / 2, y: gameSize.y - this.size.y };
-    this.floor = gameSize.y-this.size.y;
+    this.center = { x: gameSize.x / 2, y: Math.round(gameSize.y - this.size.y/2) };
+    this.floor = Math.round(dimensions.y-this.size.y/2);
     this.velocity = { x: 0, y: 0};
     this.type = "player";
     this.gravity = 0.25;
@@ -401,9 +373,10 @@
           this.velocity.x = 0;
         }
 
+        // console.log("center:",this.center.y, "Floor:", this.floor)
         if (this.center.y == this.floor){
           if (this.keyboarder.isDown(this.keyboarder.KEYS.W)) {
-              this.velocity.y -= 6;  
+              this.velocity.y -= 6;
           }
         }
         if (this.keyboarder.isDown(this.keyboarder.KEYS.S)) {
@@ -437,14 +410,14 @@
         }
       }
       
-      if (!this.alive || !world.running) //Not alive
-      {
+      // if (!this.alive || !world.running) //Not alive
+      // {
         if (this.keyboarder.isDown(82)) //r 
         {
           // this.alive = true;
           reset(world);
         }
-      }
+      // }
     },
 
     draw: function(screen) {
@@ -452,6 +425,20 @@
         screen.fillStyle="#2E2EFE";
         screen.fillRect(this.center.x - this.size.x / 2, this.center.y - this.size.y / 2,
                       this.size.x, this.size.y);
+      }
+    }, 
+
+    explode: function(world) {
+      for (var i=0; i<12; i++) {
+        // determine velocity of this piece of debris
+        var speed = Math.random() * 1.25 +0.5;
+        var direction = matrix.unitVector({ x: Math.random()*2-1, y: Math.random()*2-1});
+        var velocity = matrix.multiply(direction, speed);
+        var position = { x: this.center.x, y: this.center.y }; //matrix.add(matrix.multiply(direction, this.radius), this.center);
+        var lifespan = Math.random()*300 + 300; //40 - 240 ticks
+        var color = "blue";
+        // console.log("Debris:",i, velocity)
+        world.misc.push(new Debris(position, velocity, lifespan, color));
       }
     }
   };
@@ -498,6 +485,7 @@
     this.air_resist = 0.0;
     this.damage = 10;
     this.spent = false; //this gets set to true when this bullet hits something
+    this.floor = 10000;
   };
 
   Bullet.prototype = {
@@ -548,7 +536,7 @@
     this.air_resist = 0.0;
     this.damage = 40;
     this.spent = false; //this gets set to true when this bullet hits something
-
+    this.floor = 10000;
   };
 
   Missile.prototype = {
@@ -606,6 +594,7 @@
     this.color = {r: 255, g: 0, b: 0};
     this.lifespan = Math.round(Math.random()*20+40);
     this.age = 0;
+    this.floor = 10000;
   };
 
   Flame.prototype = {
@@ -651,16 +640,17 @@
   };
 
   // this is a misc type
-  var Debris = function(center, velocity, lifespan) {
+  var Debris = function(center, velocity, lifespan, color) {
     this.center = center;
     this.size = { x: 3, y: 3 };
-    //this.speed = Math.random*2+1; //speed from 1 to 3
-    this.velocity = velocity; //matrix.multiply(matrix.unitVector(direction), this.speed);
+    this.velocity = velocity;
+    this.color = color;
     this.lifespan = lifespan;
     this.exists = true;
     this.age = 0;
     this.gravity = 0.07;
-    this.air_resist = 0.0005;
+    this.air_resist = 0.005;
+    this.floor = dimensions.y - this.size.y;
   };
 
   Debris.prototype = {
@@ -673,7 +663,7 @@
 
     draw: function(screen) {
       // console.log("Drawing debris life:",this.lifespan, "center:",this.center)
-      screen.fillStyle="green"
+      screen.fillStyle=this.color;
       screen.fillRect(this.center.x - this.size.x / 2, this.center.y - this.size.y / 2, this.size.x, this.size.y);
     }
   };
@@ -689,6 +679,7 @@
     this.age = 0;
     this.gravity = 0.06;
     this.air_resist = 0.0;
+    this.floor = dimensions.y - this.size.y;
   };
 
   Powerup.prototype = {
@@ -739,6 +730,7 @@
     this.age = 0;
     this.gravity = 0.0;
     this.air_resist = 0.0;
+    this.floor = 10000;
   };
 
   Text.prototype = {
@@ -956,10 +948,20 @@
       body.velocity = matrix.add(body.velocity, matrix.multiply(matrix.unitVector(matrix.multiply(body.velocity, -1)), accel));
     },
 
-    // **moveCircle()** adds the velocity of the circle to its center.
+    // **moveBody()** adds the velocity of the body to its center.
     moveBody: function(body) {
+      
       body.center.x += body.velocity.x;
-      body.center.y += body.velocity.y;
+      if (body.center.y <= body.floor) {
+        body.center.y += body.velocity.y;
+      }
+      else
+      {
+        body.center.y = body.floor;
+        body.velocity.y = 0;
+        body.velocity.x *= 0.5;
+        // body.gravity = 0;
+      }
     },
 
     // **bounceCircleOffLine()** assumes `line` is intersecting `circle` and
