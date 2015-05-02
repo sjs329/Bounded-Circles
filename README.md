@@ -23,5 +23,5 @@ Javascript game inspired by Mary Rose Cook (http://maryrosecook.com/)
 * Item drops: weapons, lives, abilities etc. -M
 
 *Potentially*
-*What if we changed the scoring system to make it a more skill based instead of luck based. -M
-*Create some algorithm to take Accuracy and time and output score -M
+* What if we changed the scoring system to make it a more skill based instead of luck based. -M
+* Create some algorithm to take Accuracy and time and output score -M
