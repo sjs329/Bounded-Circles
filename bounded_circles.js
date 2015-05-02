@@ -22,9 +22,9 @@
       circles: [
         new Circle({x: Math.random()*screen.canvas.width, y: 10}, {x: Math.random()*max_speed + min_speed, y: Math.random()*max_speed + min_speed} ),
         new Circle({x: Math.random()*screen.canvas.width, y: 10}, {x: Math.random()*max_speed + min_speed, y: Math.random()*max_speed + min_speed} ),
-        new Circle({x: Math.random()*screen.canvas.width, y: 10}, {x: Math.random()*max_speed + min_speed, y: Math.random()*max_speed + min_speed} ),
-        new Circle({x: Math.random()*screen.canvas.width, y: 10}, {x: Math.random()*max_speed + min_speed, y: Math.random()*max_speed + min_speed} ),
-        new Circle({x: Math.random()*screen.canvas.width, y: 10}, {x: Math.random()*max_speed + min_speed, y: Math.random()*max_speed + min_speed} ),
+        // new Circle({x: Math.random()*screen.canvas.width, y: 10}, {x: Math.random()*max_speed + min_speed, y: Math.random()*max_speed + min_speed} ),
+        // new Circle({x: Math.random()*screen.canvas.width, y: 10}, {x: Math.random()*max_speed + min_speed, y: Math.random()*max_speed + min_speed} ),
+        // new Circle({x: Math.random()*screen.canvas.width, y: 10}, {x: Math.random()*max_speed + min_speed, y: Math.random()*max_speed + min_speed} ),
         new Circle({x: Math.random()*screen.canvas.width, y: 10}, {x: Math.random()*max_speed + min_speed, y: Math.random()*max_speed + min_speed} ),
         new Circle({x: Math.random()*screen.canvas.width, y: 10}, {x: Math.random()*max_speed + min_speed, y: Math.random()*max_speed + min_speed} ),
         new Circle({x: Math.random()*screen.canvas.width, y: 10}, {x: Math.random()*max_speed + min_speed, y: Math.random()*max_speed + min_speed} )
@@ -33,7 +33,7 @@
       // Set up the border lines.
       lines: [
         makeLine({ x: 0, y: 0 },{ x: 0, y: screen.canvas.height }),
-        makeLine({ x: 0, y: screen.canvas.height/3 },{ x: screen.canvas.width, y: screen.canvas.height/3 }),
+        makeLine({ x: 0, y: screen.canvas.height },{ x: screen.canvas.width, y: screen.canvas.height }),
         makeLine({ x: screen.canvas.width, y: screen.canvas.height },{ x: screen.canvas.width, y: 0 }),
         makeLine({ x: screen.canvas.width, y: 0 },{ x: 0, y: 0 })
       ],
@@ -279,7 +279,7 @@
         // console.log("Debris:",i, velocity)
         world.misc.push(new Debris(position, velocity, lifespan));
 
-        if (Math.random() > 0.9)
+        if (Math.random() > 0.60)
         {
           world.misc.push(new Powerup({x: this.center.x, y: this.center.y}, {x: 0, y: 0.1}));
         }
@@ -492,7 +492,7 @@
     this.type = "bullet"
     this.gravity = -0.08;
     this.air_resist = 0.0;
-    this.damage = 25;
+    this.damage = 40;
     this.spent = false; //this gets set to true when this bullet hits something
 
   };
