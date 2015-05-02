@@ -3,6 +3,8 @@ Javascript game inspired by Mary Rose Cook (http://maryrosecook.com/)
 
 *TODO:*
 * Fix circle-bouncing-off-circle physics
+  * Some collisions just don't look right
+  * balls sometimes get stuck together and do weird stuff
   * Add mass into momentum equations so we can affect circle velocity due to bullets
 * Add start screen 
   * Make a button press to start? Or maybe just a key
