@@ -3,6 +3,9 @@
   // The top-level functions that run the simulation
   // -----------------------------------------------
 
+  var max_speed = 5;
+  var min_speed = 0;
+
   // **start()** creates the lines and circles and starts the simulation.
   function start() {
 
@@ -12,23 +15,13 @@
     var screen = document.getElementById('bounded_circles').getContext('2d');
 
     var dimensions = { x: screen.canvas.width, y: screen.canvas.height };
-    var max_speed = 5;
-    var min_speed = 0;
+    
 
     // `world` holds the current state of the world.
     var world = {
 
       dimensions: dimensions,
-      circles: [
-        new Circle({x: Math.random()*screen.canvas.width, y: 10}, {x: Math.random()*max_speed + min_speed, y: Math.random()*max_speed + min_speed} ),
-        new Circle({x: Math.random()*screen.canvas.width, y: 10}, {x: Math.random()*max_speed + min_speed, y: Math.random()*max_speed + min_speed} ),
-        // new Circle({x: Math.random()*screen.canvas.width, y: 10}, {x: Math.random()*max_speed + min_speed, y: Math.random()*max_speed + min_speed} ),
-        // new Circle({x: Math.random()*screen.canvas.width, y: 10}, {x: Math.random()*max_speed + min_speed, y: Math.random()*max_speed + min_speed} ),
-        // new Circle({x: Math.random()*screen.canvas.width, y: 10}, {x: Math.random()*max_speed + min_speed, y: Math.random()*max_speed + min_speed} ),
-        new Circle({x: Math.random()*screen.canvas.width, y: 10}, {x: Math.random()*max_speed + min_speed, y: Math.random()*max_speed + min_speed} ),
-        new Circle({x: Math.random()*screen.canvas.width, y: 10}, {x: Math.random()*max_speed + min_speed, y: Math.random()*max_speed + min_speed} ),
-        new Circle({x: Math.random()*screen.canvas.width, y: 10}, {x: Math.random()*max_speed + min_speed, y: Math.random()*max_speed + min_speed} )
-      ],
+      circles: [ ],
 
       // Set up the border lines.
       lines: [
@@ -44,6 +37,8 @@
 
       misc: [],  //these are any miscellaneous objects. They must have their own draw and update functions, and these will be called every tick. They also have to have an exists boolean field that will be used to filter them
       time: 0,
+      running: false,
+      init: false,
 
       stillOnTheCanvas: function(body) {
         return body.center.x > 0 && body.center.x < screen.canvas.width &&
@@ -51,21 +46,26 @@
       }
     };
 
-
     // **tick()** is the main simulation tick function.  It loops forever, running 60ish times a second.
     function tick() {
+      if (!world.init)
+      {
+        reset(world);
+      }
       // console.log("update");
       // Update state of circles and lines.
-      dead = update(world);
+      update(world);
 
-      if (dead) {
-        printEndText("You Lose! :(", "infinity", "red");
-        return;
+      if (!world.player.alive) {
+        printEndText("You Lose! :(", "infinity", "red", world);
+        world.running = false;
+        // return;
       }
 
       if (world.circles.length == 0){
-        printEndText("You Win! :)", world.time, "blue");
-        return;
+        printEndText("You Win! :)", world.time, "blue", world);
+        world.running = false;
+        // return;
       }
       
       // console.log("draw");
@@ -78,23 +78,48 @@
 
     };
 
-    function printEndText(end_text, score, color) {
-      screen.font="50px Verdana";
-      screen.textAlign="center";
-      screen.fillStyle = "black";
-      screen.fillText("Score: "+score,dimensions.x/2,dimensions.y/4);
-      screen.font="10px Verdana";
-      screen.textAlign="center";
-      screen.fillStyle = "black";
-      screen.fillText("It's golf scoring - lower is better",dimensions.x/2,dimensions.y/4+30);
-      screen.font="30px Verdana";
-      screen.textAlign="center";
-      screen.fillStyle = color;
-      screen.fillText(end_text,dimensions.x/2,dimensions.y/2);
-      screen.font="20px Verdana";
-      screen.textAlign="center";
-      screen.fillStyle = "black";
-      screen.fillText("(Refresh page to play again)",dimensions.x/2,dimensions.y/2+30);
+    function printEndText(end_text, score, color, world) {
+      font = { 
+        style: "50px Verdana",
+        align: "center",
+        color: "black"
+      };
+      // console.log(world);
+      world.misc.push(new Text("Score: "+score, {x: dimensions.x/2, y: dimensions.y/4}, 100, font));
+
+      font = { 
+        style: "10px Verdana",
+        align: "center",
+        color: "black"
+      };
+      world.misc.push(new Text("It's golf scoring - lower is better", {x: dimensions.x/2,y: dimensions.y/4+30}, 100, font));
+
+      font = { 
+        style: "30px Verdana",
+        align: "center",
+        color: color
+      };
+      world.misc.push(new Text(end_text, {x: dimensions.x/2,y: dimensions.y/2}, 100, font));
+
+      font = { 
+        style: "20px Verdana",
+        align: "center",
+        color: "black"
+      };
+      world.misc.push(new Text("(Press 'R' to play again)", {x: dimensions.x/2,y: dimensions.y/2+30}, 100, font));
+
+      // screen.font="10px Verdana";
+      // screen.textAlign="center";
+      // screen.fillStyle = "black";
+      // screen.fillText("It's golf scoring - lower is better",dimensions.x/2,dimensions.y/4+30);
+      // screen.font="30px Verdana";
+      // screen.textAlign="center";
+      // screen.fillStyle = color;
+      // screen.fillText(end_text,dimensions.x/2,dimensions.y/2);
+      // screen.font="20px Verdana";
+      // screen.textAlign="center";
+      // screen.fillStyle = "black";
+      // screen.fillText("(Refresh page to play again)",dimensions.x/2,dimensions.y/2+30);
     };
 
     // Run the first game tick.  All future calls will be scheduled by
@@ -102,8 +127,23 @@
     tick();
   };
 
+  function reset(world) {
+    var screen = document.getElementById('bounded_circles').getContext('2d');
+    var dimensions = { x: screen.canvas.width, y: screen.canvas.height };
+
+    world.circles.length = 0;
+    for (var i=0; i<5; i++) {
+      world.circles.push(new Circle({x: Math.random()*screen.canvas.width, y: 10}, {x: Math.random()*max_speed + min_speed, y: Math.random()*max_speed + min_speed} ))
+    }
+    world.player = new Player(dimensions);
+    world.time = 0;
+    world.running = true;
+    world.init = true;
+  };
+
   // Export `start()` so it can be run by index.html
   exports.start = start;
+  // exports.menu = menu;
 
   // **update()** updates the state of the lines and circles.
   function update(world) {
@@ -117,11 +157,12 @@
     updateCircles(world);
 
     // Update player
-    dead = updatePlayer(world);
+    updatePlayer(world);
 
-    world.time += 1;
-
-    return dead;
+    if (world.running) {
+      world.time += 1;
+    }
+    
   };
 
   function updateMisc(world) {
@@ -221,10 +262,9 @@
     // Check for death
     for (var i=0; i<world.circles.length; i++){
       if (trig.distance(world.player.center, world.circles[i].center) <= (world.circles[i].radius+world.player.size.x/2)) {
-        return true; //we're dead!
+        world.player.alive = false; //we're dead!
       }
     }
-  return false; //we're still alive!
   };
 
   // **draw()** draws the all the circles and lines in the simulation.
@@ -279,7 +319,7 @@
         // console.log("Debris:",i, velocity)
         world.misc.push(new Debris(position, velocity, lifespan));
 
-        if (Math.random() > 0.60)
+        if (Math.random() > 0.95)
         {
           world.misc.push(new Powerup({x: this.center.x, y: this.center.y}, {x: 0, y: 0.1}));
         }
@@ -329,6 +369,7 @@
     this.type = "player";
     this.gravity = 0.25;
     this.air_resist = 0.0;
+    this.alive = true;
 
     // Create a keyboard object to track button presses.
     this.keyboarder = new Keyboarder();
@@ -341,64 +382,77 @@
   Player.prototype = {
     // **update()** updates the state of the player for a single tick.
     update: function(world) {
-      // If left cursor key is down...
-      if (this.keyboarder.isDown(this.keyboarder.KEYS.A)) {
-        // ... move left.
-        if (this.center.x-this.size.x > 0) {
-          this.velocity.x = -2;  
+      if (this.alive) {
+        // If left cursor key is down...
+        if (this.keyboarder.isDown(this.keyboarder.KEYS.A)) {
+          // ... move left.
+          if (this.center.x-this.size.x > 0) {
+            this.velocity.x = -2;  
+          } else {
+            this.velocity.x = 0;
+          }
+        } else if (this.keyboarder.isDown(this.keyboarder.KEYS.D)) {
+          if (this.center.x+this.size.x < this.gameSize.x) {
+            this.velocity.x = 2;  
+          } else {
+            this.velocity.x = 0;
+          }
         } else {
           this.velocity.x = 0;
         }
-      } else if (this.keyboarder.isDown(this.keyboarder.KEYS.D)) {
-        if (this.center.x+this.size.x < this.gameSize.x) {
-          this.velocity.x = 2;  
-        } else {
-          this.velocity.x = 0;
-        }
-      } else {
-        this.velocity.x = 0;
-      }
 
-      if (this.center.y == this.floor){
-        if (this.keyboarder.isDown(this.keyboarder.KEYS.W)) {
-            this.velocity.y -= 6;  
+        if (this.center.y == this.floor){
+          if (this.keyboarder.isDown(this.keyboarder.KEYS.W)) {
+              this.velocity.y -= 6;  
+          }
         }
-      }
-      if (this.keyboarder.isDown(this.keyboarder.KEYS.S)) {
-        this.velocity.y += 0.25;
-      }
+        if (this.keyboarder.isDown(this.keyboarder.KEYS.S)) {
+          this.velocity.y += 0.25;
+        }
 
-      if (world.time - this.primaryWeapon.last_fired >= this.primaryWeapon.reload_time) 
-      {
-        if (this.keyboarder.isDown(this.keyboarder.KEYS.K)) 
+        if (world.time - this.primaryWeapon.last_fired >= this.primaryWeapon.reload_time) 
         {
-          this.primaryWeapon.fire({ x: this.center.x, y: this.center.y - this.size.y - this.size.y/3 }, { x: 0, y: -1 }, world);
-        } 
-        else if(this.keyboarder.isDown(this.keyboarder.KEYS.L)) 
+          if (this.keyboarder.isDown(this.keyboarder.KEYS.K)) 
+          {
+            this.primaryWeapon.fire({ x: this.center.x, y: this.center.y - this.size.y - this.size.y/3 }, { x: 0, y: -1 }, world);
+          } 
+          else if(this.keyboarder.isDown(this.keyboarder.KEYS.L)) 
+          {
+            this.primaryWeapon.fire({ x: this.center.x, y: this.center.y + this.size.y + this.size.y/3 }, { x: 0, y: 1 }, world);
+          } 
+        }
+        if (world.time - this.secondaryWeapon.last_fired >= this.secondaryWeapon.reload_time) 
         {
-          this.primaryWeapon.fire({ x: this.center.x, y: this.center.y + this.size.y + this.size.y/3 }, { x: 0, y: 1 }, world);
-        } 
-      }
-      if (world.time - this.secondaryWeapon.last_fired >= this.secondaryWeapon.reload_time) 
-      {
-        if (this.keyboarder.isDown(this.keyboarder.KEYS.SPACE))  
+          if (this.keyboarder.isDown(this.keyboarder.KEYS.SPACE))  
+          {
+            this.secondaryWeapon.fire({ x: this.center.x, y: this.center.y - this.size.y - this.size.y/3 }, { x: 0, y: -1 }, world);
+          }
+        }
+        if (world.time - this.secretWeapon.last_fired >= this.secretWeapon.reload_time)
         {
-          this.secondaryWeapon.fire({ x: this.center.x, y: this.center.y - this.size.y - this.size.y/3 }, { x: 0, y: -1 }, world);
+          if (this.keyboarder.isDown(77)) //m
+          {
+            this.secretWeapon.fire({ x: this.center.x, y: this.center.y - this.size.y - this.size.y/3 }, { x: 0, y: -1 }, world);
+          }
         }
       }
-      if (world.time - this.secretWeapon.last_fired >= this.secretWeapon.reload_time)
+      
+      if (!this.alive || !world.running) //Not alive
       {
-        if (this.keyboarder.isDown(77))  
+        if (this.keyboarder.isDown(82)) //r 
         {
-          this.secretWeapon.fire({ x: this.center.x, y: this.center.y - this.size.y - this.size.y/3 }, { x: 0, y: -1 }, world);
+          // this.alive = true;
+          reset(world);
         }
       }
     },
 
     draw: function(screen) {
-      screen.fillStyle="#2E2EFE";
-      screen.fillRect(this.center.x - this.size.x / 2, this.center.y - this.size.y / 2,
-                    this.size.x, this.size.y);
+      if (this.alive){
+        screen.fillStyle="#2E2EFE";
+        screen.fillRect(this.center.x - this.size.x / 2, this.center.y - this.size.y / 2,
+                      this.size.x, this.size.y);
+      }
     }
   };
 
@@ -630,7 +684,7 @@
     this.radius = 9;
     this.size = { x: 10 , y: 10 };
     this.velocity = velocity; //matrix.multiply(matrix.unitVector(direction), this.speed);
-    this.lifespan = 1000;
+    this.lifespan = 400;
     this.exists = true;
     this.age = 0;
     this.gravity = 0.06;
@@ -666,12 +720,43 @@
       screen.beginPath();
       screen.arc(this.center.x, this.center.y, this.radius, 0, Math.PI*2, false);
       screen.closePath();
-      screen.fillStyle = "black";
+      screen.fillStyle = "purple";
       screen.fill();
-      screen.fillStyle="cyan"
+      screen.fillStyle="gold"
       screen.fillRect(this.center.x - this.size.x / 2, this.center.y - this.size.y / 2, this.size.x, this.size.y);
     }
   };
+
+  // this is a misc type
+  var Text = function(text, center, lifespan, font) {
+    this.text = text;
+    this.center = center;
+    this.font = font;
+    //this.size = ""+size+"px";
+    this.velocity = {x: 0, y: 0};
+    this.lifespan = lifespan;
+    this.exists = true;
+    this.age = 0;
+    this.gravity = 0.0;
+    this.air_resist = 0.0;
+  };
+
+  Text.prototype = {
+    update: function(world) {
+      this.age += 1;
+      if (this.age > this.lifespan){ 
+        this.exists = false;
+      }
+    },
+
+    draw: function(screen) {
+      screen.font = this.font.style;
+      screen.textAlign = this.font.align;
+      screen.fillStyle = this.font.color;
+      screen.fillText(this.text,this.center.x,this.center.y);
+    }
+  };
+
 
   // Keyboard input tracking
   // -----------------------
