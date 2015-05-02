@@ -8,7 +8,7 @@ Javascript game inspired by Mary Rose Cook (http://maryrosecook.com/)
   * Add mass into momentum equations so we can affect circle velocity due to bullets
 * Add start screen 
   * Make a button press to start? Or maybe just a key
-  * Also allow pressing a button to restart the game instead of refreshing
+* Allow shooting after you've won, before you restart the game. (not sure what's preventing this at the moment)
 * Organize game logic better
   * I think every physical object should get stuck into one array and update loop will just call physics on each of those objects, plus call their internal update method
 * Figure out how to make header files? or at least pull different sections into different files
