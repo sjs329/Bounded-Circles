@@ -1,12 +1,14 @@
 
 // Generic (meta) weapon. Actual weapons are defined below
-var Weapon = function(bullet, reload_time, capacity, name) {
+var Weapon = function(bullet, reload_time, capacity, name, color, symbol) {
   this.reload_time = reload_time;
   this.bullet = bullet;
   this.capacity = capacity;
   this.name = name;
+  this.color = color;   // Color and symbol are used when drawing powerups of this weapon
+  this.symbol = symbol; // a character to print on the powerup
   this.last_fired = -this.reload_time;
-  this.rounds_remaining = this.capacity;
+  this.rounds_remaining = this.capacity;  // Note that it's possible to have rounds_remaining > capacity since picking up the same gun adds ammo
 };
 
 Weapon.prototype = {
@@ -24,23 +26,23 @@ Weapon.prototype = {
 ///*******************///
 // Fishes shoot blanks.... duh
 function Fish() {
-  return new Weapon(Blank, 10000, 0, "Fish");
+  return new Weapon(Blank, 10000, 0, "Fish", "black", "-");
 };
 
 function Pistol() {
-  return new Weapon(Bullet, 5, 0, "Pistol");
+  return new Weapon(Bullet, 5, 0, "Pistol", "purple", "P");
 };
 
 function MissileLauncher() {
-  return new Weapon(Missile, 20, 10, "Missile Launcher");
+  return new Weapon(Missile, 20, 10, "Missile Launcher", "#0B610B", "M");
 };
 
 function MultiMissileLauncher() {
-  return new Weapon(MultiMissile, 40, 5, "Multi-Missile Launcher");
+  return new Weapon(MultiMissile, 40, 5, "Multi-Missile Launcher", "orange", "Q");
 };
 
 function FlameThrower() {
-  return new Weapon(Flame, 3, 75, "Flamethrower");
+  return new Weapon(Flame, 3, 75, "Flamethrower", "red", "F");
 };
 
 ///***********************///

@@ -81,7 +81,21 @@ var Game = (function (game){
       }
 
       if (Math.random() < this.powerup_probablity) {
-        world.misc.push(new game.Powerup(this.gameSize, {x: this.center.x, y: this.center.y}, {x: 0, y: 0.1}));
+        var rand = Math.random()
+        var weapon;
+        if (rand < 0.5)
+        {
+          weapon = FlameThrower;
+        }
+        else if (rand < 0.8)
+        {
+          weapon = MissileLauncher;
+        }
+        else
+        {
+          weapon = MultiMissileLauncher;
+        }
+        world.misc.push(new game.Powerup(this.gameSize, {x: this.center.x, y: this.center.y}, {x: 0, y: 0.1}, weapon));
       }
     }
   };
@@ -259,11 +273,13 @@ var Game = (function (game){
   };
 
   // this is a misc type
-  game.Powerup = function(dimensions, center, velocity) {
+  game.Powerup = function(dimensions, center, velocity, weapon) {
     this.center = center;
-    this.radius = 9;
-    this.size = { x: 10 , y: 10 };
-    this.velocity = velocity; //matrix.multiply(matrix.unitVector(direction), this.speed);
+    this.radius = 12;
+    this.size = { x: 14 , y: 14 };
+    this.velocity = velocity;
+    this.weapon = weapon;
+    this.weaponProto = new this.weapon();
     this.lifespan = 400;
     this.exists = true;
     this.age = 0;
@@ -278,42 +294,36 @@ var Game = (function (game){
       if (this.age > this.lifespan){ 
         this.exists = false;
       }
-      if (this.center.y + this.radius > world.dimensions.y) {
-        this.center.y = world.dimensions.y - this.radius;
-        this.velocity.y = 0;
-      }
-      if (trig.distance(this.center, world.player.center) <= this.radius + world.player.size.x/2) 
+      if (world.player.alive && trig.distance(this.center, world.player.center) <= this.radius + world.player.size.x/2) 
       {
         var rand = Math.random();
-        if (rand < 0.1)
+        if (rand < 0.05)
         {
           world.player.secondaryWeapon = new Fish();
         }
-        else if (rand < 0.3)
-        {
-          world.player.secondaryWeapon = new MultiMissileLauncher();
-        }
-        else if (rand < 0.65)
-        {
-          world.player.secondaryWeapon = new FlameThrower();        
-        }
         else
         {
-          world.player.secondaryWeapon = new MissileLauncher();
+          var newRoundsRemaining = this.weaponProto.rounds_remaining;
+          if (world.player.secondaryWeapon.name == this.weaponProto.name) {
+            newRoundsRemaining += world.player.secondaryWeapon.rounds_remaining;
+          }
+          world.player.secondaryWeapon = new this.weapon();
+          world.player.secondaryWeapon.rounds_remaining = newRoundsRemaining; // this can make the rounds remaining greater than the capacity. but that should be fine....
         }
         this.exists = false;
       }
     },
 
     draw: function(screen) {
-      // console.log("Drawing debris life:",this.lifespan, "center:",this.center)
       screen.beginPath();
       screen.arc(this.center.x, this.center.y, this.radius, 0, Math.PI*2, false);
       screen.closePath();
-      screen.fillStyle = "purple";
+      screen.fillStyle = this.weaponProto.color;
       screen.fill();
-      screen.fillStyle="gold"
-      screen.fillRect(this.center.x - this.size.x / 2, this.center.y - this.size.y / 2, this.size.x, this.size.y);
+      screen.font = "bold 18px arial";
+      screen.textAlign = "center";
+      screen.fillStyle = "black";
+      screen.fillText(this.weaponProto.symbol, this.center.x, this.center.y+this.radius/2);
     }
   };
 
