@@ -64,7 +64,7 @@ var Game = (function(game) {
     function tick() {
       if (!world.init)
       {
-        game.reset(world, 2);
+        game.reset(world, 0);
       }
 
       // console.log(Math.random())
