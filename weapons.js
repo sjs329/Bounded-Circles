@@ -1,30 +1,59 @@
 
-
-// Fish is a useless weapon - used to set the secondary weapon to nothing initially
-var Fish = function() {
-  this.reload_time = 10000;
-  this.bullet = 0;
-  this.type = "weapon";
+// Generic (meta) weapon. Actual weapons are defined below
+var Weapon = function(bullet, reload_time, capacity, name) {
+  this.reload_time = reload_time;
+  this.bullet = bullet;
+  this.capacity = capacity;
+  this.name = name;
   this.last_fired = -this.reload_time;
+  this.shots_fired = 0;
 };
 
-Fish.prototype = {
+Weapon.prototype = {
   fire: function(center, velocity, world) {
-    // You can't fire a fish...
+    if (this.capacity == 0 || this.shots_fired < this.capacity){
+      world.projectiles.push(new this.bullet(center, velocity));
+      this.last_fired = world.time;
+      this.shots_fired++;
+    }
   }
 };
 
-var Pistol = function() {
-  this.reload_time = 5;
-  this.bullet = new Bullet({x:0,y:0},{x:0,y:0});
-  this.type = "weapon";
-  this.last_fired = -this.reload_time;
+///*******************///
+///***** WEAPONS *****///
+///*******************///
+// Fishes shoot blanks.... duh
+function Fish() {
+  return new Weapon(Blank, 10000, 0, "Fish");
 };
 
-Pistol.prototype = {
-  fire: function(center, velocity, world) {
-    world.projectiles.push(new Bullet(center, velocity));
-    this.last_fired = world.time;
+function Pistol() {
+  return new Weapon(Bullet, 5, 0, "Pistol");
+};
+
+function MissileLauncher() {
+  return new Weapon(Missile, 20, 10, "Missile Launcher");
+};
+
+function FlameThrower() {
+  return new Weapon(Flame, 3, 75, "Flamethrower");
+};
+
+///***********************///
+//****** PROJECTILES ******//
+///***********************///
+var Blank = function(center,velocity) {
+  this.center = center;
+  this.velocity = velocity;
+  this.exists = false;
+  this.damage = 0;
+};
+
+Blank.prototype = {
+  update: function(world) {
+  },
+
+  draw: function(screen) {
   }
 };
 
@@ -41,7 +70,7 @@ var Bullet = function(center, velocity) {
   this.gravity = 0.0;
   this.air_resist = 0.0;
   this.damage = 10;
-  this.exists = true; //this gets set to true when this bullet hits something
+  this.exists = true; //this gets set to false when this bullet hits something
   this.floor = 10000;
 };
 
@@ -65,19 +94,6 @@ Bullet.prototype = {
   }
 };
 
-var MissileLauncher = function() {
-  this.reload_time = 20;
-  this.bullet = new Missile({x:0,y:0},{x:0,y:0});
-  this.type = "weapon";
-  this.last_fired = -this.reload_time;
-};
-
-MissileLauncher.prototype = {
-  fire: function(center, velocity, world) {
-    world.projectiles.push(new Missile(center, velocity));
-    this.last_fired = world.time;
-  }
-};
 
 // Missile
 // ------
@@ -92,7 +108,7 @@ var Missile = function(center, velocity) {
   this.gravity = -0.08;
   this.air_resist = 0.0;
   this.damage = 40;
-  this.exists = true; //this gets set to true when this bullet hits something
+  this.exists = true; //this gets set to false when this bullet hits something
   this.floor = 10000;
 };
 
@@ -123,21 +139,10 @@ Missile.prototype = {
   }
 };
 
-var FlameThrower = function() {
-  this.reload_time = 3;
-  this.bullet = new Missile({x:0,y:0},{x:0,y:0});
-  this.type = "weapon";
-  this.last_fired = -this.reload_time;
-};
+// Missile
+// ------
 
-FlameThrower.prototype = {
-  fire: function(center, velocity, world) {
-    world.projectiles.push(new Flame(center, velocity));
-    this.last_fired = world.time;
-  }
-};
-
-// **new Missile()** creates a new bullet.
+// **new Flame()** creates a new bullet.
 var Flame = function(center, velocity) {
   this.center = center;
   this.radius = 5;

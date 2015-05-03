@@ -125,9 +125,9 @@ var Game = (function (game){
     // Create a keyboard object to track button presses.
     this.keyboarder = new Keyboarder();
 
-    this.primaryWeapon = new Pistol();
-    this.secondaryWeapon = new Fish();
-    this.secretWeapon = new FlameThrower();
+    this.primaryWeapon = Pistol();
+    this.secondaryWeapon = Fish();
+    this.secretWeapon = FlameThrower();
   };
 
   game.Player.prototype = {
@@ -161,9 +161,8 @@ var Game = (function (game){
           this.velocity.x = 0;
         }
 
-        // console.log("center:",this.center.y, "Floor:", this.floor)
         if (this.center.y >= this.floor){
-          if (this.keyboarder.isDown(this.keyboarder.KEYS.W)) {
+          if (this.keyboarder.isDown(this.keyboarder.KEYS.SPACE) || this.keyboarder.isDown(this.keyboarder.KEYS.W)) {
               this.velocity.y -= 6;
           }
         }
@@ -184,28 +183,24 @@ var Game = (function (game){
         }
         if (world.time - this.secondaryWeapon.last_fired >= this.secondaryWeapon.reload_time) 
         {
-          if (this.keyboarder.isDown(this.keyboarder.KEYS.SPACE))  
+          if (this.keyboarder.isDown(this.keyboarder.KEYS.J))  
           {
             this.secondaryWeapon.fire({ x: this.center.x, y: this.center.y - this.size.y - this.size.y/3 }, { x: 0, y: -1 }, world);
           }
         }
         if (world.time - this.secretWeapon.last_fired >= this.secretWeapon.reload_time)
         {
-          if (this.keyboarder.isDown(77)) //m
+          if (this.keyboarder.isDown(this.keyboarder.KEYS.SIX))
           {
             this.secretWeapon.fire({ x: this.center.x, y: this.center.y - this.size.y - this.size.y/3 }, { x: 0, y: -1 }, world);
           }
         }
       }
       
-      // if (!this.alive || !world.running) //Not alive
-      // {
-        if (this.keyboarder.isDown(82)) //r 
+        if (this.keyboarder.isDown(this.keyboarder.KEYS.R))
         {
-          // this.alive = true;
           game.reset(world);
         }
-      // }
     },
 
     draw: function(screen) {
