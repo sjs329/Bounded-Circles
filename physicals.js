@@ -104,6 +104,7 @@ var Game = (function (game){
   game.Line = function(pt1, pt2) {
     this.end1 = pt1;
     this.end2 = pt2;
+    this.len = trig.distance(this.end1, this.end2);
   };
 
   game.Line.prototype = {
@@ -214,10 +215,25 @@ var Game = (function (game){
         }
       }
       
+      if (!world.running) //this level is over
+      {
         if (this.keyboarder.isDown(this.keyboarder.KEYS.R))
         {
-          game.reset(world);
+          game.reset(world, 0);
         }
+        if (world.player.alive) //we won!
+        {
+          if (this.keyboarder.isDown(this.keyboarder.KEYS.N))
+          {
+            var next_level = world.level + 1;
+            if (next_level < game.levels.length)
+              game.reset(world, world.level + 1);
+            else
+              console.log("No more levels!");
+          }
+        }
+      }
+      
     },
 
     draw: function(screen) {

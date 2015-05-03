@@ -30,7 +30,11 @@ function Fish() {
 };
 
 function Pistol() {
-  return new Weapon(Bullet, 5, 0, "Pistol", "purple", "P");
+  return new Weapon(Bullet, 10, 0, "Pistol", "purple", "P");
+};
+
+function SMG() {
+  return new Weapon(Bullet, 5, 150, "SMG", "gray", "S");
 };
 
 function MissileLauncher() {
