@@ -121,6 +121,7 @@ var Game = (function(game) {
 
   game.reset = function(world) {
     world.misc.length = 0;
+    world.projectiles.length = 0;
     world.circles.length = 0;
     for (var i=0; i<5; i++) {
       world.circles.push(new game.Circle(world.dimensions, {x: Math.random()*screen.canvas.width, y: 10}, {x: Math.random()*max_speed + min_speed, y: Math.random()*max_speed + min_speed} ))
