@@ -118,6 +118,7 @@ var Game = (function (game){
     this.floor = Math.round(gameSize.y-this.size.y/2);
     this.velocity = { x: 0, y: 0};
     this.type = "player";
+    this.speed = 3;
     this.gravity = 0.25;
     this.air_resist = 0.0;
     this.alive = true;
@@ -148,13 +149,13 @@ var Game = (function (game){
         if (this.keyboarder.isDown(this.keyboarder.KEYS.A)) {
           // ... move left.
           if (this.center.x-Math.round(this.size.x/2) > 0) {
-            this.velocity.x = -2;  
+            this.velocity.x = -this.speed;  
           } else {
             this.velocity.x = 0;
           }
         } else if (this.keyboarder.isDown(this.keyboarder.KEYS.D)) {
           if (this.center.x+Math.round(this.size.x/2) < this.gameSize.x) {
-            this.velocity.x = 2;  
+            this.velocity.x = this.speed;  
           } else {
             this.velocity.x = 0;
           }
