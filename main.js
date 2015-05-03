@@ -130,7 +130,7 @@ var Game = (function(game) {
     world.projectiles.length = 0;
     world.circles.length = 0;
     for (var i=0; i<num_circles; i++) {
-      world.circles.push(new game.Circle(world.dimensions, {x: Math.floor(Math.random()*screen.canvas.width)+1, y: Math.floor(Math.random()*40)+40}, {x: Math.floor(Math.random()*max_speed) + min_speed, y: Math.floor(Math.random()*max_speed) + min_speed} ))
+      world.circles.push(new game.Circle(world.dimensions, {x: Math.floor(Math.random()*screen.canvas.width)+1, y: Math.floor(Math.random()*100)+40}, {x: Math.floor(Math.random()*max_speed) + min_speed, y: Math.floor(Math.random()*max_speed) + min_speed} ))
       // make sure this circle isn't overlapping another one
       for (var j=i-1; j>=0; j--) {
         if (trig.isCircleIntersectingCircle(world.circles[i], world.circles[j])) {
@@ -167,17 +167,16 @@ var Game = (function(game) {
     world.circles = world.circles.filter(world.stillOnTheCanvas);
     world.projectiles = world.projectiles.filter(world.stillOnTheCanvas);
     world.misc = world.misc.filter(world.stillOnTheCanvas);
-    // console.log(world.persistant)
+    // console.log(world.projectiles)
     world.persistant = world.persistant.filter(world.stillOnTheCanvas);
 
 
     var bodies = [world.player].concat(world.projectiles).concat(world.misc).concat(world.persistant).concat(world.circles);
     for (var i = 0; i < bodies.length; i++) {
-      bodies[i].update(world);
       physics.applyGravity(bodies[i]);
       physics.applyAirResistance(bodies[i]);
       physics.moveBody(bodies[i]);
-
+      bodies[i].update(world);
     }
 
     //remove anything that no longer exists
@@ -190,8 +189,8 @@ var Game = (function(game) {
     for (var i=0; i<world.circles.length; i++) world.circles[i].circle_checked = false;
 
     // Update weapon text info
-    world.primaryWeaponText.text = "Primary Weapon:   "+world.player.primaryWeapon.name+"\nRounds Remaining: "+(world.player.primaryWeapon.capacity > 0 ? world.player.primaryWeapon.rounds_remaining : "Inf");
-    world.secondaryWeaponText.text = "Secondary Weapon: "+world.player.secondaryWeapon.name+"\nRounds Remaining: "+(world.player.secondaryWeapon.capacity > 0 ? world.player.secondaryWeapon.rounds_remaining : "Inf");
+    world.primaryWeaponText.setText("Primary Weapon:   "+world.player.primaryWeapon.name+"\nRounds Remaining: "+(world.player.primaryWeapon.capacity > 0 ? world.player.primaryWeapon.rounds_remaining : "Inf"));
+    world.secondaryWeaponText.setText("Secondary Weapon: "+world.player.secondaryWeapon.name+"\nRounds Remaining: "+(world.player.secondaryWeapon.capacity > 0 ? world.player.secondaryWeapon.rounds_remaining : "Inf"));
 
     world.time += 1;
     

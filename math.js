@@ -117,6 +117,19 @@ var matrix = {
     return {x: vector.x*scalar, y: vector.y*scalar}
   },
 
+  radians: function(degrees) {
+    return degrees * Math.PI / 180.0;
+  },
+
+  rotate: function(vector, angle) {
+    var angle_rad = this.radians(angle);
+    var x = vector.x * Math.cos(angle_rad) - vector.y * Math.sin(angle_rad);
+    var y = vector.x * Math.sin(angle_rad) + vector.y * Math.cos(angle_rad);
+    return {x: x, y: y};
+  },
+
+
+
   add: function (vector1, vector2) {
     return {x: vector1.x + vector2.x, y: vector1.y + vector2.y}
   },

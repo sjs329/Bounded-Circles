@@ -127,6 +127,7 @@ var Game = (function (game){
     this.keyboarder = new Keyboarder();
 
     this.primaryWeapon = Pistol();
+    // this.primaryWeapon = MultiMissileLauncher();
     this.secondaryWeapon = Fish();
     this.secretWeapon = FlameThrower();
     this.secretWeapon.capacity = 0;
@@ -283,9 +284,18 @@ var Game = (function (game){
       }
       if (trig.distance(this.center, world.player.center) <= this.radius + world.player.size.x/2) 
       {
-        if (Math.random() > 0.5)
+        var rand = Math.random();
+        if (rand < 0.1)
         {
-          world.player.secondaryWeapon = new FlameThrower();
+          world.player.secondaryWeapon = new Fish();
+        }
+        else if (rand < 0.3)
+        {
+          world.player.secondaryWeapon = new MultiMissileLauncher();
+        }
+        else if (rand < 0.65)
+        {
+          world.player.secondaryWeapon = new FlameThrower();        
         }
         else
         {
@@ -324,6 +334,10 @@ var Game = (function (game){
   };
 
   game.Text.prototype = {
+    setText: function(newText) {
+      this.text = newText;
+    },
+
     update: function(world) {
       this.age += 1;
       if (this.lifespan > 0 && this.age > this.lifespan){ 

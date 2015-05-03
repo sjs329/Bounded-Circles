@@ -17,7 +17,6 @@ var physics = {
 
   // **moveBody()** adds the velocity of the body to its center.
   moveBody: function(body) {
-    
     body.center.x += body.velocity.x;
     if (body.center.y <= body.floor) {
       body.center.y += body.velocity.y;

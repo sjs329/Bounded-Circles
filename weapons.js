@@ -12,7 +12,7 @@ var Weapon = function(bullet, reload_time, capacity, name) {
 Weapon.prototype = {
   fire: function(center, velocity, world) {
     if (this.capacity == 0 || this.rounds_remaining > 0){
-      world.projectiles.push(new this.bullet(center, velocity));
+      world.projectiles = world.projectiles.concat(new this.bullet(center, velocity));
       this.last_fired = world.time;
       this.rounds_remaining--;
     }
@@ -33,6 +33,10 @@ function Pistol() {
 
 function MissileLauncher() {
   return new Weapon(Missile, 20, 10, "Missile Launcher");
+};
+
+function MultiMissileLauncher() {
+  return new Weapon(MultiMissile, 40, 5, "Multi-Missile Launcher");
 };
 
 function FlameThrower() {
@@ -116,6 +120,7 @@ Missile.prototype = {
 
   // **update()** updates the state of the bullet for a single tick.
   update: function(world) {
+    // console.log("updating missle",this.center)
     for (var j=0; j<world.circles.length; j++){
       if (trig.distance(world.circles[j].center, this.center) <= world.circles[j].hit_area) {
         world.circles[j].health -= this.damage;
@@ -139,7 +144,27 @@ Missile.prototype = {
   }
 };
 
-// Missile
+
+///*** This is a meta-bullet that creates Multiple Missiles travelling at angles relative to the given velocity
+// **new MultiMissile()** creates a new bullet.
+var MultiMissile = function(center, velocity) {
+  this.center = center;
+  this.velocity = velocity;
+  this.type = "Meta-Bullet"
+  this.baseBullet = Missile; //the underlying type that this meta bullet uses
+  this.relativeAngles = [60, 30, 0, -30, -60];
+  var childMissiles = [];
+  for (var i=0; i<this.relativeAngles.length; i++){
+    var newCenter = {x: this.center.x, y: this.center.y};
+    var newVelocity = matrix.rotate(this.velocity, this.relativeAngles[i]);
+    childMissiles.push(new this.baseBullet(newCenter, newVelocity));
+  } 
+  // console.log("Returning:", childMissiles)
+  return childMissiles;
+};
+
+
+// Flame
 // ------
 
 // **new Flame()** creates a new bullet.
