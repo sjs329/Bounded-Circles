@@ -56,12 +56,12 @@
       // Update state of circles and lines.
       update(world);
 
-      if (!world.player.alive) {
+      if (!world.player.alive && world.running) {
         printEndText("You Lose! :(", "infinity", "red", world);
         world.running = false;
       }
 
-      if (world.circles.length == 0){
+      if (world.circles.length == 0 && world.running){
         printEndText("You Win! :)", world.time, "blue", world);
         world.running = false;
       }
@@ -81,28 +81,28 @@
         color: "black"
       };
       // console.log(world);
-      world.misc.push(new Text("Score: "+score, {x: dimensions.x/2, y: dimensions.y/4}, 100, font));
+      world.misc.push(new Text("Score: "+score, {x: dimensions.x/2, y: dimensions.y/4}, 0, font));
 
       font = { 
         style: "10px Verdana",
         align: "center",
         color: "black"
       };
-      world.misc.push(new Text("It's golf scoring - lower is better", {x: dimensions.x/2,y: dimensions.y/4+30}, 100, font));
+      world.misc.push(new Text("It's golf scoring - lower is better", {x: dimensions.x/2,y: dimensions.y/4+30}, 0, font));
 
       font = { 
         style: "30px Verdana",
         align: "center",
         color: color
       };
-      world.misc.push(new Text(end_text, {x: dimensions.x/2,y: dimensions.y/2}, 100, font));
+      world.misc.push(new Text(end_text, {x: dimensions.x/2,y: dimensions.y/2}, 0, font));
 
       font = { 
         style: "20px Verdana",
         align: "center",
         color: "black"
       };
-      world.misc.push(new Text("(Press 'R' to play again)", {x: dimensions.x/2,y: dimensions.y/2+30}, 100, font));
+      world.misc.push(new Text("(Press 'R' to play again)", {x: dimensions.x/2,y: dimensions.y/2+30}, 0, font));
     };
 
     // Run the first game tick.  All future calls will be scheduled by
@@ -141,9 +141,9 @@
     // Update player
     updatePlayer(world);
 
-    if (world.running) {
+    // if (world.running) {
       world.time += 1;
-    }
+    // }
     
   };
 
@@ -358,13 +358,13 @@
         // If left cursor key is down...
         if (this.keyboarder.isDown(this.keyboarder.KEYS.A)) {
           // ... move left.
-          if (this.center.x-this.size.x > 0) {
+          if (this.center.x-Math.round(this.size.x/2) > 0) {
             this.velocity.x = -2;  
           } else {
             this.velocity.x = 0;
           }
         } else if (this.keyboarder.isDown(this.keyboarder.KEYS.D)) {
-          if (this.center.x+this.size.x < this.gameSize.x) {
+          if (this.center.x+Math.round(this.size.x/2) < this.gameSize.x) {
             this.velocity.x = 2;  
           } else {
             this.velocity.x = 0;
@@ -726,6 +726,7 @@
     //this.size = ""+size+"px";
     this.velocity = {x: 0, y: 0};
     this.lifespan = lifespan;
+    this.type = "text"
     this.exists = true;
     this.age = 0;
     this.gravity = 0.0;
@@ -736,7 +737,7 @@
   Text.prototype = {
     update: function(world) {
       this.age += 1;
-      if (this.age > this.lifespan){ 
+      if (this.lifespan > 0 && this.age > this.lifespan){ 
         this.exists = false;
       }
     },
