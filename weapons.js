@@ -107,7 +107,7 @@ var Missile = function(center, velocity) {
   this.type = "bullet"
   this.gravity = -0.08;
   this.air_resist = 0.0;
-  this.damage = 50;
+  this.damage = 100;
   this.exists = true; //this gets set to false when this bullet hits something
   this.floor = 10000;
 };
