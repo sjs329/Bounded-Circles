@@ -59,6 +59,8 @@ var Game = (function(game) {
       {
         game.reset(world);
       }
+
+      // console.log(Math.random())
       // Update state of circles and lines.
       game.update(world);
 
@@ -122,6 +124,14 @@ var Game = (function(game) {
     world.circles.length = 0;
     for (var i=0; i<5; i++) {
       world.circles.push(new game.Circle(world.dimensions, {x: Math.random()*screen.canvas.width, y: 10}, {x: Math.random()*max_speed + min_speed, y: Math.random()*max_speed + min_speed} ))
+      // make sure this circle isn't overlapping another one
+      for (var j=i-1; j>=0; j--) {
+        if (trig.isCircleIntersectingCircle(world.circles[i], world.circles[j])) {
+          var d = matrix.subtract(world.circles[i], world.circles[j]);
+          var new_d = matrix.multiply(matrix.unitVector(d), world.circles[i].radius+world.circles[j].radius+0.5); //vector from j to i so they're not touching
+          world.circles[i].center = matrix.add(world.circles[j].center, new_d);
+        }
+      }
     }
     world.player = new game.Player(world.dimensions);
     world.time = 0;
@@ -144,10 +154,11 @@ var Game = (function(game) {
 
     var bodies = [world.player].concat(world.projectiles).concat(world.misc).concat(world.persistant).concat(world.circles);
     for (var i = 0; i < bodies.length; i++) {
+      bodies[i].update(world);
       physics.applyGravity(bodies[i]);
       physics.applyAirResistance(bodies[i]);
       physics.moveBody(bodies[i]);
-      bodies[i].update(world);
+
     }
 
     //remove anything that no longer exists

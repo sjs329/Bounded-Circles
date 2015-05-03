@@ -57,25 +57,31 @@ var physics = {
   bounceCircleOffCircle: function(circle1, circle2) {
 
     // find point where circles met (approximately)
-    var epsilon = 0.001;
-    var true_dist = circle1.radius + circle2.radius;
-    var current_dist = matrix.magnitude(matrix.subtract(circle1.center, circle2.center));
-    var divisor = 0.5; // binary search velocity divisor
-    var sign = 1;
-    //for (var i=0; i<10; i++) {
-    while (current_dist - true_dist > epsilon) {
-      // if (current_dist - true_dist <= epsilon) {
-      //   break;
-      // }
-      if (current_dist < true_dist) { sign = -1; }
-      else { sign = 1; }
-      circle1.center = matrix.add(circle1.center, matrix.muliply(matrix.multiply(circle1.velocity, divisor), sign));
-      circle2.center = matrix.add(circle2.center, matrix.muliply(matrix.multiply(circle2.velocity, divisor), sign));
-      current_dist = matrix.magnitude(matrix.subtract(circle1.center, circle2.center));
-      divisor = divisor/2;
-    }
+    // var epsilon = 0.01;
+    // var true_dist = circle1.radius + circle2.radius;
+    // var current_dist = trig.distance(circle1.center, circle2.center);
+    // var divisor = 0.5; // binary search velocity divisor
+    // var sign = 1;
+    // // for (var i=0; i<1000; i++) {
+    // while (Math.abs(true_dist-current_dist) > epsilon) {
+    //   console.log("Dist:", true_dist-current_dist, "Vel:", circle1.velocity, circle2.velocity);
+    //   // if (Math.abs(current_dist - true_dist) <= epsilon) {
+    //   //   break;
+    //   // }
+    //   if (current_dist < true_dist) { sign = -1; }
+    //   else { sign = 1; }
+    //   circle1.center = matrix.add(circle1.center, matrix.multiply(matrix.multiply(circle1.velocity, divisor), sign));
+    //   circle2.center = matrix.add(circle2.center, matrix.multiply(matrix.multiply(circle2.velocity, divisor), sign));
+    //   current_dist = trig.distance(circle1.center, circle2.center);
+    //   // console.log(Math.abs(current_dist-true_dist));
+    //   divisor = divisor/2;
+    // }
+    // console.log(Math.abs(current_dist-true_dist));
 
     var d = matrix.subtract(circle2.center, circle1.center);
+    var new_d = matrix.multiply(matrix.unitVector(d), (circle2.radius+circle1.radius)); //vector from j to i so they're barely touching
+    circle2.center = matrix.add(circle1.center, new_d);
+
     // console.log("d",d)
 
     var v1 = circle1.velocity;

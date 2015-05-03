@@ -78,11 +78,10 @@ var Game = (function (game){
         var color = "green";
         // console.log("Debris:",i, velocity)
         world.persistant.push(new game.Debris(this.gameSize, position, velocity, lifespan, color));
+      }
 
-        if (Math.random() > 0.95)
-        {
-          world.misc.push(new game.Powerup(this.gameSize, {x: this.center.x, y: this.center.y}, {x: 0, y: 0.1}));
-        }
+      if (Math.random() > 0.6) {
+        world.misc.push(new game.Powerup(this.gameSize, {x: this.center.x, y: this.center.y}, {x: 0, y: 0.1}));
       }
     }
   };
