@@ -156,6 +156,9 @@ var Game = (function(game) {
     world.misc = world.misc.filter(world.stillExists);
     world.persistant = world.persistant.filter(world.stillExists);
 
+    // Special case for circles to reset their circle_checked field
+    for (var i=0; i<world.circles.length; i++) world.circles[i].circle_checked = false;
+
     world.time += 1;
     
   };

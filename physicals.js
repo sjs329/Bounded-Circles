@@ -9,6 +9,8 @@ var Game = (function (game){
     this.radius = 10;
     this.health = 100;
     this.exists = true;
+    this.circle_checked = false;
+
     this.hit_area = 10;
     this.mass = 1;
     this.gravity = 0.06;
@@ -34,14 +36,19 @@ var Game = (function (game){
         }
       }
 
-      // // Run through all circles.
-      // for (var i = 0; i < world.circles.length; i++) {
-      //   var circle2 = world.circles[i];
+      if (!this.circle_checked){
+        // Run through all circles.
+        for (var i = 0; i < world.circles.length; i++) {
+          if (world.circles[i].center == this.center) continue; //this is ourself - don't check ourself
+          var circle2 = world.circles[i];
 
-      //   if (trig.isCircleIntersectingCircle(this, circle2)) {
-      //     physics.bounceCircleOffCircleSingleUpdate(this, circle2); //this is inefficient because it doesn't update both circles. Couldn't figure out how else to do it with this setup...
-      //   }
-      // }
+          if (trig.isCircleIntersectingCircle(this, circle2)) {
+            physics.bounceCircleOffCircle(this, circle2);
+            circle2.circle_checked = true;
+          }
+        }
+        this.circle_checked = true;
+      }
       
     },
 
