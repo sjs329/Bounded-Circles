@@ -2,11 +2,6 @@
 // Keyboard input tracking
 // -----------------------
 
-// this prevents the spacebar from scrolling down
-window.onkeydown = function(e) { 
-  return !(e.keyCode == 32);
-};
-
 // **new Keyboarder()** creates a new keyboard input tracking object.
 var Keyboarder = function() {
 

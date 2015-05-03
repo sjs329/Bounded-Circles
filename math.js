@@ -88,7 +88,7 @@ var matrix = {
   // Sort of like the vector's speed.  A vector with a larger x or y
   // will have a larger magnitude.
   magnitude: function(vector) {
-    return Math.sqrt(vector.x * vector.x + vector.y * vector.y);
+    return Math.sqrt(Math.pow(vector.x, 2)+ Math.pow(vector.y, 2));
   },
 
   // **unitVector()** returns the unit vector for `vector`.

@@ -8,6 +8,7 @@ var Game = (function (game){
     this.velocity = velocity;
     this.radius = 10;
     this.health = 100;
+    this.exists = true;
     this.hit_area = 10;
     this.mass = 1;
     this.gravity = 0.06;
@@ -16,6 +17,34 @@ var Game = (function (game){
   };
 
   game.Circle.prototype = {
+    update: function(world) {
+      if (this.health <= 0) {
+        this.explode(world);
+        this.exists = false;
+        return; //don't need to check for bounces
+      }
+
+      // Run through all lines.
+      for (var j = 0; j < world.lines.length; j++) {
+        var line = world.lines[j];
+
+        // If `line` is intersecting `circle`, bounce circle off line.
+        if (trig.isLineIntersectingCircle(this, line)) {
+          physics.bounceCircleOffLine(this, line);
+        }
+      }
+
+      // // Run through all circles.
+      // for (var i = 0; i < world.circles.length; i++) {
+      //   var circle2 = world.circles[i];
+
+      //   if (trig.isCircleIntersectingCircle(this, circle2)) {
+      //     physics.bounceCircleOffCircleSingleUpdate(this, circle2); //this is inefficient because it doesn't update both circles. Couldn't figure out how else to do it with this setup...
+      //   }
+      // }
+      
+    },
+
     // The circle has its own built-in `draw()` function.  This allows
     // the main `draw()` to just polymorphicly call `draw()` on circles and lines.
     draw: function(screen) {
@@ -41,7 +70,7 @@ var Game = (function (game){
         var lifespan = Math.random() *90 + 30; //40 - 240 ticks
         var color = "green";
         // console.log("Debris:",i, velocity)
-        world.misc.push(new game.Debris(this.gameSize, position, velocity, lifespan, color));
+        world.persistant.push(new game.Debris(this.gameSize, position, velocity, lifespan, color));
 
         if (Math.random() > 0.95)
         {
@@ -97,8 +126,17 @@ var Game = (function (game){
 
   game.Player.prototype = {
     // **update()** updates the state of the player for a single tick.
-    update: function(world) {
+    update: function(world) {  
       if (this.alive) {
+        // Check for death
+        for (var i=0; i<world.circles.length; i++){
+          if (trig.distance(this.center, world.circles[i].center) <= (world.circles[i].radius+this.size.x/2)) {
+            this.alive = false; //we're dead!
+            this.explode(world);
+          }
+        }
+
+        // Key presses
         // If left cursor key is down...
         if (this.keyboarder.isDown(this.keyboarder.KEYS.A)) {
           // ... move left.
@@ -118,7 +156,7 @@ var Game = (function (game){
         }
 
         // console.log("center:",this.center.y, "Floor:", this.floor)
-        if (this.center.y == this.floor){
+        if (this.center.y >= this.floor){
           if (this.keyboarder.isDown(this.keyboarder.KEYS.W)) {
               this.velocity.y -= 6;
           }
@@ -173,7 +211,7 @@ var Game = (function (game){
     }, 
 
     explode: function(world) {
-      for (var i=0; i<12; i++) {
+      for (var i=0; i<20; i++) {
         // determine velocity of this piece of debris
         var speed = Math.random() * 1.25 +0.5;
         var direction = matrix.unitVector({ x: Math.random()*2-1, y: Math.random()*2-1});
@@ -182,7 +220,7 @@ var Game = (function (game){
         var lifespan = Math.random()*300 + 300; //40 - 240 ticks
         var color = "blue";
         // console.log("Debris:",i, velocity)
-        world.misc.push(new game.Debris(this.gameSize, position, velocity, lifespan, color));
+        world.persistant.push(new game.Debris(this.gameSize, position, velocity, lifespan, color));
       }
     }
   };

@@ -37,6 +37,7 @@ var Game = (function(game) {
 
       projectiles: [],
 
+      persistant: [], //these won't get cleared when the game is reset. Make sure there's a good reason for adding something here (it looks cool is a good reason :D)
       misc: [],  //these are any miscellaneous objects. They must have their own draw and update functions, and these will be called every tick. They also have to have an exists boolean field that will be used to filter them
       time: 0,
       running: false,
@@ -45,6 +46,10 @@ var Game = (function(game) {
       stillOnTheCanvas: function(body) {
         return body.center.x > 0 && body.center.x < screen.canvas.width &&
                body.center.y > 0 && body.center.y < screen.canvas.height;
+      },
+
+      stillExists: function(body) {
+        return body.exists;
       }
     };
 
@@ -67,6 +72,7 @@ var Game = (function(game) {
         world.running = false;
       }
       
+      // console.log("Player:",world.player.center)
       // Draw circles and lines.
       game.draw(world, screen);
 
@@ -112,9 +118,7 @@ var Game = (function(game) {
   };
 
   game.reset = function(world) {
-    // var screen = document.getElementById('bounded_circles').getContext('2d');
-    // var dimensions = { x: screen.canvas.width, y: screen.canvas.height };
-
+    world.misc.length = 0;
     world.circles.length = 0;
     for (var i=0; i<5; i++) {
       world.circles.push(new game.Circle(world.dimensions, {x: Math.random()*screen.canvas.width, y: 10}, {x: Math.random()*max_speed + min_speed, y: Math.random()*max_speed + min_speed} ))
@@ -131,129 +135,38 @@ var Game = (function(game) {
   // **update()** updates the state of the lines and circles.
   game.update = function(world) {
 
-    game.updateMisc(world);
+    //remove anything that's off screen
+    world.circles = world.circles.filter(world.stillOnTheCanvas);
+    world.projectiles = world.projectiles.filter(world.stillOnTheCanvas);
+    world.misc = world.misc.filter(world.stillOnTheCanvas);
+    world.persistant = world.persistant.filter(world.stillOnTheCanvas);
 
-    // Move bullets
-    game.updateProjectiles(world);
 
-    // Move and bounce the circles.
-    game.updateCircles(world);
+    var bodies = [world.player].concat(world.projectiles).concat(world.misc).concat(world.persistant).concat(world.circles);
+    for (var i = 0; i < bodies.length; i++) {
+      physics.applyGravity(bodies[i]);
+      physics.applyAirResistance(bodies[i]);
+      physics.moveBody(bodies[i]);
+      bodies[i].update(world);
+    }
 
-    // Update player
-    game.updatePlayer(world);
+    //remove anything that no longer exists
+    world.circles = world.circles.filter(world.stillExists);
+    world.projectiles = world.projectiles.filter(world.stillExists);
+    world.misc = world.misc.filter(world.stillExists);
+    world.persistant = world.persistant.filter(world.stillExists);
 
-    // if (world.running) {
-      world.time += 1;
-    // }
+    world.time += 1;
     
   };
 
-  game.updateMisc = function(world) {
-    world.misc = world.misc.filter(world.stillOnTheCanvas);
-    for (var i=0; i < world.misc.length; i++) {
-      physics.applyGravity(world.misc[i]);
-      physics.applyAirResistance(world.misc[i]);
-      physics.moveBody(world.misc[i]);
-      world.misc[i].update(world);
-    }
-    var stillExists = function(misc_obj) {
-      return misc_obj.exists;
-    }
-    world.misc = world.misc.filter(stillExists);
-  }
-
-  // **updateCircles()** moves and bounces the circles.
-  game.updateCircles = function(world) {
-
-    world.circles = world.circles.filter(world.stillOnTheCanvas);
-
-    var stillAlive = function(circle) {
-      ret_val = circle.health > 0;
-      if (!ret_val) {
-        circle.explode(world);
-      }
-      return ret_val;
-    };
-    world.circles = world.circles.filter(stillAlive);
-
-
-    for (var i = world.circles.length - 1; i >= 0; i--) {
-      var circle = world.circles[i];
-
-      // Run through all lines.
-      for (var j = 0; j < world.lines.length; j++) {
-        var line = world.lines[j];
-
-        // If `line` is intersecting `circle`, bounce circle off line.
-        if (trig.isLineIntersectingCircle(circle, line)) {
-          physics.bounceCircleOffLine(circle, line);
-        }
-      }
-
-      // Run through all circles.
-      for (var j = 0; j < i; j++) {
-        var circle2 = world.circles[j];
-
-        // If `line` is intersecting `circle`, bounce circle off line.
-        if (trig.isCircleIntersectingCircle(circle, circle2)) {
-          physics.bounceCircleOffCircle(circle, circle2);
-        }
-      }
-
-      // // Apply gravity to the velocity of `circle`.
-      physics.applyGravity(circle);
-
-      // Apply air resistance to the velocity of 'circle'
-      physics.applyAirResistance(circle);
-
-      // Move `circle` according to its velocity.
-      physics.moveBody(circle);
-    }
-  };
-
-  game.updateProjectiles = function(world) {
-    // remove any bullets that are off the canvas
-    world.projectiles = world.projectiles.filter(world.stillOnTheCanvas);
-
-    // loop through bullets to move them and check for circle collisions
-    for (var i = 0; i < world.projectiles.length; i++) {
-      // Move bullets
-      physics.applyGravity(world.projectiles[i]);
-      physics.applyAirResistance(world.projectiles[i]);
-      physics.moveBody(world.projectiles[i]);
-      world.projectiles[i].update(world);
-    }
-
-    var notSpent = function(projectile) {
-      return !projectile.spent;
-    }
-    world.projectiles = world.projectiles.filter(notSpent);
-
-  };
-
-  game.updatePlayer = function(world) {
-    world.player.update(world); //get presses
-    if (world.player.alive){
-      physics.moveBody(world.player);
-      physics.applyGravity(world.player);
-
-      // Check for death
-      for (var i=0; i<world.circles.length; i++){
-        if (trig.distance(world.player.center, world.circles[i].center) <= (world.circles[i].radius+world.player.size.x/2)) {
-          world.player.alive = false; //we're dead!
-          world.player.explode(world);
-        }
-      }
-    }
-  };
-
-  // **draw()** draws the all the circles and lines in the simulation.
+  // **draw()** draws everything
   game.draw = function(world, screen) {
     // Clear away the drawing from the previous tick.
     screen.clearRect(0, 0, world.dimensions.x, world.dimensions.y);
 
     // the concatenation order determines the draw order - rightmost is on top
-    var bodies = world.lines.concat(world.player).concat(world.projectiles).concat(world.misc).concat(world.circles);
+    var bodies = world.lines.concat(world.player).concat(world.projectiles).concat(world.misc).concat(world.persistant).concat(world.circles);
     for (var i = 0; i < bodies.length; i++) {
       bodies[i].draw(screen);
     }
@@ -261,6 +174,11 @@ var Game = (function(game) {
 
   // Start
   // -----
+
+  // this prevents the spacebar from scrolling down
+  window.onkeydown = function(e) { 
+    return !(e.keyCode == 32);
+  };
 
   // When the DOM is ready, start the simulation.
   window.addEventListener('load', game.start);

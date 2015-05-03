@@ -9,6 +9,7 @@ var physics = {
   },
 
   applyAirResistance: function(body) {
+    if (body.velocity.x == 0 && body.velocity.y == 0) return;
     var speed = matrix.magnitude(body.velocity)
     var accel = body.air_resist * speed*speed;
     body.velocity = matrix.add(body.velocity, matrix.multiply(matrix.unitVector(matrix.multiply(body.velocity, -1)), accel));
@@ -96,6 +97,53 @@ var physics = {
     circle1.velocity = v1_new;
     circle2.velocity = v2_new;
   },
+
+  // // **bounceCircleOffCircle()** assumes `circle1` is intersecting `circle2` and
+  // // bounces `circle1` off `circle2`, but only updates circle1's position/velocity
+  // bounceCircleOffCircleSingleUpdate: function(circle1, circle2) {
+
+  //   // find point where circles met (approximately)
+  //   var epsilon = 0.001;
+  //   var true_dist = circle1.radius + circle2.radius;
+  //   var current_dist = matrix.magnitude(matrix.subtract(circle1.center, circle2.center));
+  //   var divisor = 0.5; // binary search velocity divisor
+  //   var sign = 1;
+  //   var circ_2_center = circle2.center;
+  //   //for (var i=0; i<10; i++) {
+  //   while (current_dist - true_dist > epsilon) {
+  //     // if (current_dist - true_dist <= epsilon) {
+  //     //   break;
+  //     // }
+  //     if (current_dist < true_dist) { sign = -1; }
+  //     else { sign = 1; }
+  //     circle1.center = matrix.add(circle1.center, matrix.muliply(matrix.multiply(circle1.velocity, divisor), sign));
+  //     circ_2_center = matrix.add(circle2.center, matrix.muliply(matrix.multiply(circle2.velocity, divisor), sign));
+  //     current_dist = matrix.magnitude(matrix.subtract(circle1.center, circ_2_center));
+  //     divisor = divisor/2;
+  //   }
+
+  //   var d = matrix.subtract(circ_2_center, circle1.center);
+  //   // console.log("d",d)
+
+  //   var v1 = circle1.velocity;
+  //   var v2 = circle2.velocity;
+
+  //   var factor = 1/(d.x*d.x + d.y*d.y);
+  //   // console.log("factor:", factor)
+
+  //   var v1_new = {
+  //     x: factor*(v2.x*d.x*d.x + v2.y*d.x*d.y + v1.x*d.y*d.y - v1.y*d.x*d.y),
+  //     y: factor*(v1.x*d.x*d.x + v1.y*d.x*d.y + v2.x*d.y*d.y - v2.y*d.x*d.y)
+  //   };
+
+  //   var v2_new = {
+  //     x: factor*(v2.x*d.x*d.y + v2.y*d.y*d.y - v1.x*d.x*d.y + v1.y*d.x*d.x),
+  //     y: factor*(v1.x*d.x*d.y + v1.y*d.y*d.y - v2.x*d.x*d.y + v2.y*d.x*d.x)
+  //   };
+
+  //   circle1.velocity = v1_new;
+  //   // circle2.velocity = v2_new;
+  // },
 
   // **bounceLineNormal()** assumes `line` intersects `circle`.  It
   // returns the normal to the side of the line that the `circle` is
