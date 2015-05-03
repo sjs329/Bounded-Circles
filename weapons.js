@@ -6,15 +6,15 @@ var Weapon = function(bullet, reload_time, capacity, name) {
   this.capacity = capacity;
   this.name = name;
   this.last_fired = -this.reload_time;
-  this.shots_fired = 0;
+  this.rounds_remaining = this.capacity;
 };
 
 Weapon.prototype = {
   fire: function(center, velocity, world) {
-    if (this.capacity == 0 || this.shots_fired < this.capacity){
+    if (this.capacity == 0 || this.rounds_remaining > 0){
       world.projectiles.push(new this.bullet(center, velocity));
       this.last_fired = world.time;
-      this.shots_fired++;
+      this.rounds_remaining--;
     }
   }
 };
@@ -69,7 +69,7 @@ var Bullet = function(center, velocity) {
   this.type = "bullet"
   this.gravity = 0.0;
   this.air_resist = 0.0;
-  this.damage = 10;
+  this.damage = 15;
   this.exists = true; //this gets set to false when this bullet hits something
   this.floor = 10000;
 };
@@ -107,7 +107,7 @@ var Missile = function(center, velocity) {
   this.type = "bullet"
   this.gravity = -0.08;
   this.air_resist = 0.0;
-  this.damage = 40;
+  this.damage = 50;
   this.exists = true; //this gets set to false when this bullet hits something
   this.floor = 10000;
 };

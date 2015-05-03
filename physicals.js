@@ -10,11 +10,11 @@ var Game = (function (game){
     this.health = 100;
     this.exists = true;
     this.circle_checked = false;
-
+    this.powerup_probablity = 0.60;
     this.hit_area = 10;
     this.mass = 1;
     this.gravity = 0.06;
-    this.air_resist = 0.0005;
+    this.air_resist = 0.0002;
     this.floor = 100000; //larger number so that the circle is allowed to intersect the floor. this is how we detect collisions
   };
 
@@ -80,7 +80,7 @@ var Game = (function (game){
         world.persistant.push(new game.Debris(this.gameSize, position, velocity, lifespan, color));
       }
 
-      if (Math.random() > 0.6) {
+      if (Math.random() < this.powerup_probablity) {
         world.misc.push(new game.Powerup(this.gameSize, {x: this.center.x, y: this.center.y}, {x: 0, y: 0.1}));
       }
     }
@@ -128,6 +128,7 @@ var Game = (function (game){
     this.primaryWeapon = Pistol();
     this.secondaryWeapon = Fish();
     this.secretWeapon = FlameThrower();
+    this.secretWeapon.capacity = 0;
   };
 
   game.Player.prototype = {
@@ -329,11 +330,20 @@ var Game = (function (game){
       }
     },
 
+    fillTextMultiLine: function(screen, text, x, y) {
+      var lineHeight = screen.measureText("M").width * 1.5;
+      var lines = text.split("\n");
+      for (var i = 0; i < lines.length; ++i) {
+        screen.fillText(lines[i], x, y);
+        y += lineHeight;
+      }
+    },
+
     draw: function(screen) {
       screen.font = this.font.style;
       screen.textAlign = this.font.align;
       screen.fillStyle = this.font.color;
-      screen.fillText(this.text,this.center.x,this.center.y);
+      this.fillTextMultiLine(screen, this.text, this.center.x, this.center.y);
     }
   };
 
