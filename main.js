@@ -152,6 +152,7 @@ var Game = (function(game) {
     world.player.primaryWeapon = new game.levels[level].primaryWeapon;
     world.player.secondaryWeapon = new game.levels[level].secondaryWeapon;
     world.player.secretWeapon = new game.levels[level].secretWeapon;
+    world.player.secretWeapon.capacity = 0;
     // world.player.alive = true;
 
     world.primaryWeaponText = new game.Text("",
