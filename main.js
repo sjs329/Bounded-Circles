@@ -128,6 +128,7 @@ var Game = (function(game) {
   };
 
   game.reset = function(world, level) {
+    if (level < 0 || level >= game.levels.length) level = 0; // make sure this level exists
     world.level = level;
     world.misc.length = 0;
     world.projectiles.length = 0;
