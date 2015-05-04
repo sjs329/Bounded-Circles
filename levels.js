@@ -116,6 +116,33 @@ var Game = (function(game) {
         secretWeapon: MultiMissileLauncher
       }),
       //-------- END LEVEL 3 ---------//
+
+      //-----------------//
+      //---- LEVEL 4 ----//
+      //-----------------//
+      new Level(
+      {
+        // Set up the border lines.
+        lines: [
+          new game.Line({ x: 0, y: 0 },{ x: 0, y: game.screen.canvas.height }),
+          new game.Line({ x: 0, y: game.screen.canvas.height },{ x: game.screen.canvas.width, y: game.screen.canvas.height }),
+          new game.Line({ x: game.screen.canvas.width, y: game.screen.canvas.height },{ x: game.screen.canvas.width, y: 0 }),
+          new game.Line({ x: game.screen.canvas.width, y: 0 },{ x: 0, y: 0 }),
+          new game.Line({ x: 0, y: game.dimensions.y}, {x:game.dimensions.x, y:game.dimensions.y}),
+
+          // middle lines:
+          new game.Line({ x: game.dimensions.x/6, y: game.dimensions.y/3}, {x: game.dimensions.x/3, y:game.dimensions.y/3}),
+          new game.Line({ x: game.dimensions.x/2, y: game.dimensions.y/3}, {x: game.dimensions.x*(2/3), y:game.dimensions.y/3}),
+          new game.Line({ x: game.dimensions.x*5/6, y: game.dimensions.y/3}, {x: game.dimensions.x, y:game.dimensions.y/3}),
+          // new game.Line({ x: game.dimensions.x*2/3, y: game.dimensions.y/3}, {x:game.dimensions.x*7/8, y:game.dimensions.y/3}),
+        ],
+
+        num_rand_circles: 12,
+        primaryWeapon: MultiMissileLauncher,
+        secondaryWeapon: MultiMissileLauncher,
+        secretWeapon: MultiMissileLauncher
+      }),
+      //-------- END LEVEL 4 ---------//
     ];
   }
   return game;
