@@ -276,7 +276,30 @@ var Game = (function (game){
           }
         }
       }
-      
+      if (this.keyboarder.isDown(this.keyboarder.KEYS.ONE) && this.keyboarder.isDown(this.keyboarder.KEYS.SHIFT))
+        {
+          game.reset(world, 0);
+        }
+      if (this.keyboarder.isDown(this.keyboarder.KEYS.TWO) && this.keyboarder.isDown(this.keyboarder.KEYS.SHIFT))
+        {
+          game.reset(world, 1);
+        }
+      if (this.keyboarder.isDown(this.keyboarder.KEYS.THREE) && this.keyboarder.isDown(this.keyboarder.KEYS.SHIFT))
+        {
+          game.reset(world, 2);
+        }
+      if (this.keyboarder.isDown(this.keyboarder.KEYS.FOUR) && this.keyboarder.isDown(this.keyboarder.KEYS.SHIFT))
+        {
+          game.reset(world, 3);
+        }
+      if (this.keyboarder.isDown(this.keyboarder.KEYS.FIVE) && this.keyboarder.isDown(this.keyboarder.KEYS.SHIFT))
+        {
+          game.reset(world, 4);
+        }
+      if (this.keyboarder.isDown(this.keyboarder.KEYS.SIX) && this.keyboarder.isDown(this.keyboarder.KEYS.SHIFT))
+        {
+          game.reset(world, 5);
+        }
     },
 
     draw: function(screen) {
