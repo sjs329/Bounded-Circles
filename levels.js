@@ -35,8 +35,8 @@ var Game = (function(game) {
           new game.Line({ x: 0, y: game.dimensions.y}, {x:game.dimensions.x, y:game.dimensions.y}),
 
           // low lines:
-          // new game.Line({ x: game.dimensions.x/8, y: game.dimensions.y*7/8}, {x:game.dimensions.x/3, y:game.dimensions.y*7/8}),
-          // new game.Line({ x: game.dimensions.x*2/3, y: game.dimensions.y*7/8}, {x:game.dimensions.x*7/8, y:game.dimensions.y*7/8}),
+          new game.Line({ x: game.dimensions.x/8, y: game.dimensions.y*7/8}, {x:game.dimensions.x/3, y:game.dimensions.y*7/8}),
+          new game.Line({ x: game.dimensions.x*2/3, y: game.dimensions.y*7/8}, {x:game.dimensions.x*7/8, y:game.dimensions.y*7/8}),
         ],
 
         num_rand_circles: 1, // if this is zero, the circles array below should already be populated. if it's not zero, random circles will be added up to this amount

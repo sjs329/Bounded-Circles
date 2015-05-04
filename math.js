@@ -79,6 +79,44 @@ var trig = {
 
     // Return true if distance is less than the radius.
     return distance < (circle1.radius + circle2.radius);
+  },
+
+  // will return true if the lines intersect and false if not. If true, point will hold the intersection point.
+  // Not sure if this is really working correctly...
+  getIntersectionPoint: function(line1, line2) 
+  {
+    // console.log("Intersecting", line1, "with", line2)
+    var s1 = matrix.subtract(line1.end2, line1.end1);
+    var s2 = matrix.subtract(line2.end2, line1.end1);
+    var p = matrix.subtract(line1.end1, line2.end1);
+
+    var s, t, div;
+    div = (-s2.x*s1.y+s1.x*s2.y);
+    if (div == 0) return {failed: true}; // I think this means they're parallel
+
+    s = (-s1.y*p.x + s1.x*p.y) / div;
+    t = ( s2.x*p.y - s2.y*p.x) / div;
+
+    if (s >= 0 && s <= 1 && t >= 0 && t <= 1)
+    {
+      // Intersection detected
+      point = { 
+        x: line1.end1.x + (t * s1.x),
+        y: line1.end1.y + (t * s1.y),
+      }
+      return point;
+    }
+    return {failed: true}; // No intersection
+
+  },
+
+  isLineUnderPoint: function(line, point)
+  {
+    if ((point.x >= line.end1.x && point.x <= line.end2.x) || (point.x <= line.end1.x && point.x >= line.end2.x))
+    {
+      return (line.end1.y > point.y && line.end2.y > point.y);
+    }
+    return false;
   }
 };
 

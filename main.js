@@ -17,7 +17,7 @@ var Game = (function(game) {
     // Grab that canvas out of the DOM.  From it, get the drawing
     // context, an object that contains functions that allow drawing to the canvas.
     game.screen = document.getElementById('bounded_circles').getContext('2d');
-    game.dimensions = { x: game.screen.canvas.width, y: game.screen.canvas.height - 40 };
+    game.dimensions = { x: game.screen.canvas.width, y: game.screen.canvas.height - 50 };
     game.levels = game.buildLevels();
 
     // `world` holds the current state of the world.
@@ -43,7 +43,9 @@ var Game = (function(game) {
       misc: [],  //these are any miscellaneous objects. They must have their own draw and update functions, and these will be called every tick. They also have to have an exists boolean field that will be used to filter them
       
       primaryWeaponText: "",
+      primaryReloadBar: {},
       secondaryWeaponText: "",
+      secondaryReloadBar: {},
 
       time: 0,
       running: false,
@@ -74,7 +76,7 @@ var Game = (function(game) {
       if (!world.player.alive && world.running) {
         printScoreText("infinity", "black", world);
         printMainText("You Lose! :(", "red", world);
-        printSubText("(Press 'R' to play again)", "black", world);
+        printSubText("(Press 'R' to restart the game)", "black", world);
         world.running = false;
       }
 
@@ -83,11 +85,11 @@ var Game = (function(game) {
         printMainText("You Win! :)", "blue", world);
         if (world.level == game.levels.length-1) 
         {
-          printSubText("(That was the last level! Press 'R' to play again)", "black", world);
+          printSubText("(That was the last level! Press 'R' to restart the game)", "black", world);
         }
         else
         {
-          printSubText("(Press 'N' to go to the next level)", "black", world);
+          printSubText("(Press 'N' to go to the next level, 'R' to play this one again)", "black", world);
         }
         world.running = false;
       }
@@ -152,16 +154,20 @@ var Game = (function(game) {
     world.player.secretWeapon = new game.levels[level].secretWeapon;
     // world.player.alive = true;
 
-    world.primaryWeaponText = new game.Text("Primary Weapon:   "+world.player.primaryWeapon.name+"\nRounds Remaining: "+(world.player.primaryWeapon.capacity > 0 ? world.player.primaryWeapon.rounds_remaining : "Inf"),
-                                     {x: 5, y: game.dimensions.y +20},
+    world.primaryWeaponText = new game.Text("",
+                                     {x: 5, y: game.dimensions.y +15},
                                      0,
                                      {style: "15px Courier", align: "left", color: "black"} )
-    world.secondaryWeaponText = new game.Text("Secondary Weapon: "+world.player.secondaryWeapon.name+"\nRounds Remaining: "+(world.player.secondaryWeapon.capacity > 0 ? world.player.secondaryWeapon.rounds_remaining : "Inf"),
-                                     {x: game.dimensions.x/2+5, y: game.dimensions.y+20},
+    world.primaryReloadBar = new game.FillBar({x: 218, y: game.dimensions.y+40}, {x: 100, y: 12}, "gray", 0.0);
+    world.secondaryWeaponText = new game.Text("",
+                                     {x: game.dimensions.x/2, y: game.dimensions.y+15},
                                      0,
                                      {style: "15px Courier", align: "left", color: "black"} )
+    world.secondaryReloadBar = new game.FillBar({x: game.dimensions.x/2 + 215, y: game.dimensions.y+40}, {x: 100, y: 12}, "gray", 0.0);
     world.misc.push(world.primaryWeaponText);
+    world.misc.push(world.primaryReloadBar);
     world.misc.push(world.secondaryWeaponText);
+    world.misc.push(world.secondaryReloadBar);
 
     world.time = 0;
     world.running = true;
@@ -200,9 +206,10 @@ var Game = (function(game) {
     for (var i=0; i<world.circles.length; i++) world.circles[i].circle_checked = false;
 
     // Update weapon text info
-    world.primaryWeaponText.setText("Primary Weapon:   "+world.player.primaryWeapon.name+"\nRounds Remaining: "+(world.player.primaryWeapon.capacity > 0 ? world.player.primaryWeapon.rounds_remaining : "Inf"));
-    world.secondaryWeaponText.setText("Secondary Weapon: "+world.player.secondaryWeapon.name+"\nRounds Remaining: "+(world.player.secondaryWeapon.capacity > 0 ? world.player.secondaryWeapon.rounds_remaining : "Inf"));
-
+    world.primaryWeaponText.setText("Primary Weapon:   "+world.player.primaryWeapon.name+"\nRounds Remaining: "+(world.player.primaryWeapon.capacity > 0 ? world.player.primaryWeapon.rounds_remaining : "Infinite")+"\nReload Time:");
+    world.primaryReloadBar.setPercent((world.time - world.player.primaryWeapon.last_fired)/world.player.primaryWeapon.reload_time);
+    world.secondaryWeaponText.setText("Secondary Weapon: "+world.player.secondaryWeapon.name+"\nRounds Remaining: "+(world.player.secondaryWeapon.capacity > 0 ? world.player.secondaryWeapon.rounds_remaining : "Infinite")+"\nReload Time:");
+    world.secondaryReloadBar.setPercent((world.time - world.player.secondaryWeapon.last_fired)/world.player.secondaryWeapon.reload_time);
     world.time += 1;
     
   };

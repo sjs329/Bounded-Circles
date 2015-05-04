@@ -157,8 +157,43 @@ var Game = (function (game){
           if (trig.distance(this.center, world.circles[i].center) <= (world.circles[i].radius+this.size.x/2)) {
             this.alive = false; //we're dead!
             this.explode(world);
+            return;
           }
         }
+
+
+        // var head = {x: this.center.x, y: Math.floor(this.center.y-this.size.y/2)};
+        // this.floor = Math.round(this.gameSize.y-this.size.y/2);
+        // for (var i=0; i<world.lines.length; i++)
+        // {
+        //   if (trig.isLineUnderPoint(world.lines[i], head))
+        //   {
+        //     if (world.lines[i].end1.y - (head.y+this.size.y) < this.floor - this.center.y)
+        //     {
+        //       this.floor = Math.floor(world.lines[i].end1.y-this.size.y/2);
+        //     }
+        //   }
+        // }
+
+        // // Update the floor
+        // var feet = Math.floor(this.center.y+this.size.y/2);
+        // var d = this.gameSize.y - feet;
+        // var drop = new game.Line({x: this.center.x, y: feet}, {x: this.center.x, y: this.gameSize.y + 1});
+        // var intersect;
+        // var count = 0;
+        // for (var i=0; i<world.lines.length; i++) {
+        //   // console.log(line)
+        //   var intersect = trig.getIntersectionPoint(drop, world.lines[i]);
+        //   if (intersect.failed) continue;
+        //   count++;
+        //   var potentialFloor = Math.round(intersect.y-this.size.y/2);
+        //   if (potentialFloor - feet < d){
+        //     console.log("There's something below me")
+        //     d = potentialFloor - feet;
+        //     this.floor = potentialFloor;
+        //   }
+        // }
+        // console.log(count);
 
         // Key presses
         // If left cursor key is down...
@@ -212,6 +247,14 @@ var Game = (function (game){
           {
             this.secretWeapon.fire({ x: this.center.x, y: this.center.y - this.size.y - this.size.y/3 }, { x: 0, y: -1 }, world);
           }
+        }
+
+        if (this.keyboarder.isDown(this.keyboarder.KEYS.R))
+        {
+          if (world.level == game.levels.length-1) //if it's the last level, start over
+            game.reset(world, 0);
+          else
+            game.reset(world, world.level);
         }
       }
       
@@ -385,6 +428,43 @@ var Game = (function (game){
       screen.textAlign = this.font.align;
       screen.fillStyle = this.font.color;
       this.fillTextMultiLine(screen, this.text, this.center.x, this.center.y);
+    }
+  };
+
+  game.FillBar = function(center, size, color, percent) {
+    this.center = center;
+    this.size = size;
+    this.color = color;
+    this.percent = percent;
+    this.velocity = {x:0, y:0};
+    this.type = "fillbar"
+    this.exists = true;
+    this.gravity = 0.0;
+    this.air_resist = 0.0;
+    this.floor = 10000;
+  };
+
+  game.FillBar.prototype = {
+    setPercent: function(percent)
+    {
+      if (percent > 1) percent = 1;
+      if (percent < 0) percent = 0;
+      this.percent = percent;
+    },
+
+    setColor: function(color)
+    {
+      this.color = color;
+    },
+
+    update: function(world) { }, //nothing to update
+
+    draw: function(screen) {
+      screen.fillStyle = this.color;
+      screen.fillRect(this.center.x - this.size.x / 2, this.center.y - this.size.y / 2, this.size.x*this.percent, this.size.y);
+      screen.beginPath();
+      screen.rect(this.center.x - this.size.x / 2, this.center.y - this.size.y / 2, this.size.x, this.size.y);
+      screen.stroke();
     }
   };
 

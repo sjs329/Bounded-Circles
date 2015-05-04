@@ -23,6 +23,7 @@ var physics = {
     }
     else
     {
+      // console.log("Snapping to floor")
       body.center.y = body.floor;
       body.velocity.y = 0;
       body.velocity.x *= 0.5;
