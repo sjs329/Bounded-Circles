@@ -27,13 +27,13 @@ var Game = (function(game) {
       circles: [ ],
 
       // Set up the border lines.
-      lines: [
-        new game.Line({ x: 0, y: 0 },{ x: 0, y: game.screen.canvas.height }),
-        new game.Line({ x: 0, y: game.screen.canvas.height },{ x: game.screen.canvas.width, y: game.screen.canvas.height }),
-        new game.Line({ x: game.screen.canvas.width, y: game.screen.canvas.height },{ x: game.screen.canvas.width, y: 0 }),
-        new game.Line({ x: game.screen.canvas.width, y: 0 },{ x: 0, y: 0 }),
-        new game.Line({ x: 0, y: game.dimensions.y}, {x:game.dimensions.x, y:game.dimensions.y})
-      ],
+      lines: [ ],
+      //   new game.Line({ x: 0, y: 0 },{ x: 0, y: game.screen.canvas.height }),
+      //   new game.Line({ x: 0, y: game.screen.canvas.height },{ x: game.screen.canvas.width, y: game.screen.canvas.height }),
+      //   new game.Line({ x: game.screen.canvas.width, y: game.screen.canvas.height },{ x: game.screen.canvas.width, y: 0 }),
+      //   new game.Line({ x: game.screen.canvas.width, y: 0 },{ x: 0, y: 0 }),
+      //   new game.Line({ x: 0, y: game.dimensions.y}, {x:game.dimensions.x, y:game.dimensions.y})
+      // ],
 
       player: new game.Player(game.dimensions),
 
@@ -130,32 +130,33 @@ var Game = (function(game) {
   game.reset = function(world, level) {
     if (level < 0 || level >= game.levels.length) level = 0; // make sure this level exists
     world.level = level;
-    world.misc.length = 0;
-    world.projectiles.length = 0;
-    world.lines = game.levels[level].lines;
-    
-    world.circles.length = 0;
 
-    if (game.levels[level].num_rand_circles > 0) {
-      for (var i=0; i<game.levels[level].num_rand_circles; i++) {
-        world.circles.push(new game.Circle(world.dimensions, {x: Math.floor(Math.random()*game.screen.canvas.width)+1, y: Math.floor(Math.random()*100)+40}, {x: Math.floor(Math.random()*max_speed) + min_speed, y: Math.floor(Math.random()*max_speed) + min_speed} ))
-        // make sure this circle isn't overlapping another one
-        for (var j=i-1; j>=0; j--) {
-          if (trig.isCircleIntersectingCircle(world.circles[i], world.circles[j])) {
-            var d = matrix.subtract(world.circles[i], world.circles[j]);
-            var new_d = matrix.multiply(matrix.unitVector(d), world.circles[i].radius+world.circles[j].radius+0.5); //vector from j to i so they're not touching
-            world.circles[i].center = matrix.add(world.circles[j].center, new_d);
-          }
-        }
-      }
+    // Clear arrays
+    world.misc.length = 0;
+    world.projectiles.length = 0;    
+
+    // rebuild lines and circles if they exists in this level
+    if (game.levels[level].lines) 
+    {
+      world.lines.length = 0;
+      game.buildLines(world, game.levels[level].lines);
     }
+    // console.log(game.levels[level])
+    if (game.levels[level].circles || game.levels[level].num_rand_circles > 0) 
+    {
+      world.circles.length = 0;
+      game.buildCircles(world, game.levels[level].circles, game.levels[level].num_rand_circles);
+    }
+
+    // rebuild player
     world.player = new game.Player(world.dimensions); //game.levels[level].player;
     world.player.primaryWeapon = new game.levels[level].primaryWeapon;
     world.player.secondaryWeapon = new game.levels[level].secondaryWeapon;
     world.player.secretWeapon = new game.levels[level].secretWeapon;
     world.player.secretWeapon.capacity = 0;
-    // world.player.alive = true;
+    world.player.secretWeapon.reload_time = 2;
 
+    // Set up weapon status text
     world.primaryWeaponText = new game.Text("",
                                      {x: 5, y: game.dimensions.y +15},
                                      0,
@@ -171,9 +172,42 @@ var Game = (function(game) {
     world.misc.push(world.secondaryWeaponText);
     world.misc.push(world.secondaryReloadBar);
 
+    // game logic vars
     world.time = 0;
     world.running = true;
     world.init = true;
+  };
+
+  game.buildLines = function(world, lines)
+  {
+    for (var i=0; i<lines.length; i++)
+    {
+      world.lines.push(new game.Line(lines[i]));
+    }
+  };
+
+  game.buildCircles = function(world, circles, num_rand)
+  {
+    if (circles)
+    {
+      for (var i=0; i<circles.length; i++)
+      {
+        world.circles.push(new game.Circle(circles[i]));
+      }
+    }
+    if (num_rand > 0) {
+      for (var i=0; i<num_rand; i++) {
+        world.circles.push(new game.Circle({gameSize: world.dimensions, center: {x: Math.floor(Math.random()*game.screen.canvas.width)+1, y: Math.floor(Math.random()*100)+40}, velocity: {x: Math.floor(Math.random()*max_speed) + min_speed, y: Math.floor(Math.random()*max_speed) + min_speed} } ))
+        // make sure this circle isn't overlapping another one
+        for (var j=i-1; j>=0; j--) {
+          if (trig.isCircleIntersectingCircle(world.circles[i], world.circles[j])) {
+            var d = matrix.subtract(world.circles[i], world.circles[j]);
+            var new_d = matrix.multiply(matrix.unitVector(d), world.circles[i].radius+world.circles[j].radius+0.5); //vector from j to i so they're not touching
+            world.circles[i].center = matrix.add(world.circles[j].center, new_d);
+          }
+        }
+      }
+    }
   };
 
   // // Export `start()` so it can be run by index.html
@@ -182,6 +216,7 @@ var Game = (function(game) {
   // **update()** updates the state of the lines and circles.
   game.update = function(world) {
 
+    // console.log(world.circles)
     //remove anything that's off screen
     world.circles = world.circles.filter(world.stillOnTheCanvas);
     world.projectiles = world.projectiles.filter(world.stillOnTheCanvas);
@@ -226,40 +261,6 @@ var Game = (function(game) {
     for (var i = 0; i < bodies.length; i++) {
       bodies[i].draw(screen);
     }
-  };
-
-  function clone(obj) {
-    var copy;
-
-    // Handle the 3 simple types, and null or undefined
-    if (null == obj || "object" != typeof obj) return obj;
-
-    // Handle Date
-    if (obj instanceof Date) {
-        copy = new Date();
-        copy.setTime(obj.getTime());
-        return copy;
-    }
-
-    // Handle Array
-    if (obj instanceof Array) {
-        copy = [];
-        for (var i = 0, len = obj.length; i < len; i++) {
-            copy[i] = clone(obj[i]);
-        }
-        return copy;
-    }
-
-    // Handle Object
-    if (obj instanceof Object) {
-        copy = {};
-        for (var attr in obj) {
-            if (obj.hasOwnProperty(attr)) copy[attr] = clone(obj[attr]);
-        }
-        return copy;
-    }
-
-    throw new Error("Unable to copy obj! Its type isn't supported.");
   };
 
   // Start

@@ -2,10 +2,10 @@ var Game = (function (game){
 
   // var game = {};
   // **new Circle()** creates a circle that has the passed `center`.
-  game.Circle = function(gameSize, center, velocity) {
-    this.gameSize = gameSize;
-    this.center = center;
-    this.velocity = velocity;
+  game.Circle = function( args ) { //gameSize, center, velocity) {
+    this.gameSize = args.gameSize;
+    this.center = {x: args.center.x, y: args.center.y};
+    this.velocity = {x: args.velocity.x, y: args.velocity.y};
     this.radius = 10;
     this.health = 100;
     this.exists = true;
@@ -101,9 +101,10 @@ var Game = (function (game){
   };
 
   // **makeLine()** creates a line
-  game.Line = function(pt1, pt2) {
-    this.end1 = pt1;
-    this.end2 = pt2;
+  game.Line = function( args ) { // pt1, pt2) {
+    // console.log(args)
+    this.end1 = args.pt1;
+    this.end2 = args.pt2;
     this.len = trig.distance(this.end1, this.end2);
   };
 
