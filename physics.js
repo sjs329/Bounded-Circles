@@ -18,16 +18,34 @@ var physics = {
   // **moveBody()** adds the velocity of the body to its center.
   moveBody: function(body) {
     body.center.x += body.velocity.x;
-    if (body.center.y <= body.floor) {
+    if (body.velocity.y < 0 || body.center.y < body.floor) {
       body.center.y += body.velocity.y;
     }
     else
     {
-      // console.log("Snapping to floor")
       body.center.y = body.floor;
       body.velocity.y = 0;
       body.velocity.x *= 0.5;
-      // body.gravity = 0;
+    }
+  },
+
+  updateFloor: function(world, body)
+  {
+    body.floor = world.dimensions.y-body.size.y/2;
+    var feet = {x: body.center.x, y: body.center.y+body.size.y/2};
+    var prev_feet = {x: body.center.x, y: feet.y - body.velocity.y};
+    for (var i=0; i<world.lines.length; i++)
+    {
+      if (trig.isPointUnderLine(world.lines[i], feet))
+      {
+        if (trig.isLineUnderPoint(world.lines[i], prev_feet))
+        {
+          body.floor = world.lines[i].end1.y - body.size.y/2;
+          // floor_changed = true;
+          body.center.y = body.floor;
+          break;
+        }
+      }
     }
   },
 

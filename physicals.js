@@ -131,7 +131,7 @@ var Game = (function (game){
     this.gameSize = gameSize;
     this.size = { x: 15, y: 15 };
     this.center = { x: gameSize.x / 2, y: Math.round(gameSize.y - this.size.y/2) };
-    this.floor = Math.round(gameSize.y-this.size.y/2);
+    this.floor = gameSize.y-this.size.y/2;
     this.velocity = { x: 0, y: 0};
     this.type = "player";
     this.speed = 3;
@@ -163,38 +163,9 @@ var Game = (function (game){
         }
 
 
-        // var head = {x: this.center.x, y: Math.floor(this.center.y-this.size.y/2)};
-        // this.floor = Math.round(this.gameSize.y-this.size.y/2);
-        // for (var i=0; i<world.lines.length; i++)
-        // {
-        //   if (trig.isLineUnderPoint(world.lines[i], head))
-        //   {
-        //     if (world.lines[i].end1.y - (head.y+this.size.y) < this.floor - this.center.y)
-        //     {
-        //       this.floor = Math.floor(world.lines[i].end1.y-this.size.y/2);
-        //     }
-        //   }
-        // }
+        // if we're falling, check to see if we fall through a line
+        physics.updateFloor(world, this);
 
-        // // Update the floor
-        // var feet = Math.floor(this.center.y+this.size.y/2);
-        // var d = this.gameSize.y - feet;
-        // var drop = new game.Line({x: this.center.x, y: feet}, {x: this.center.x, y: this.gameSize.y + 1});
-        // var intersect;
-        // var count = 0;
-        // for (var i=0; i<world.lines.length; i++) {
-        //   // console.log(line)
-        //   var intersect = trig.getIntersectionPoint(drop, world.lines[i]);
-        //   if (intersect.failed) continue;
-        //   count++;
-        //   var potentialFloor = Math.round(intersect.y-this.size.y/2);
-        //   if (potentialFloor - feet < d){
-        //     console.log("There's something below me")
-        //     d = potentialFloor - feet;
-        //     this.floor = potentialFloor;
-        //   }
-        // }
-        // console.log(count);
 
         // Key presses
         // If left cursor key is down...

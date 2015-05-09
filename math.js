@@ -114,7 +114,16 @@ var trig = {
   {
     if ((point.x >= line.end1.x && point.x <= line.end2.x) || (point.x <= line.end1.x && point.x >= line.end2.x))
     {
-      return (line.end1.y > point.y && line.end2.y > point.y);
+      return (line.end1.y >= point.y && line.end2.y >= point.y);
+    }
+    return false;
+  },
+
+  isPointUnderLine: function(line, point)
+  {
+    if ((point.x >= line.end1.x && point.x <= line.end2.x) || (point.x <= line.end1.x && point.x >= line.end2.x))
+    {
+      return (line.end1.y <= point.y && line.end2.y <= point.y);
     }
     return false;
   }
