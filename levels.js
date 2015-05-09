@@ -37,10 +37,6 @@ var Game = (function(game) {
 
           //line above weapon info text
           { pt1: { x: 0, y: game.dimensions.y}, pt2: {x:game.dimensions.x, y:game.dimensions.y} },
-
-          // low lines
-          { pt1: { x: game.dimensions.x/8, y: game.dimensions.y*7/8}, pt2: {x:game.dimensions.x/3, y:game.dimensions.y*7/8} },
-          { pt1: { x: game.dimensions.x*2/3, y: game.dimensions.y*7/8}, pt2: {x:game.dimensions.x*7/8, y:game.dimensions.y*7/8} },
         ],
 
         circles: [
@@ -73,6 +69,10 @@ var Game = (function(game) {
 
           //line above weapon info text
           { pt1: { x: 0, y: game.dimensions.y}, pt2: {x:game.dimensions.x, y:game.dimensions.y} },
+
+          // low lines
+          { pt1: { x: game.dimensions.x/8, y: game.dimensions.y*7/8}, pt2: {x:game.dimensions.x/3, y:game.dimensions.y*7/8} },
+          { pt1: { x: game.dimensions.x*2/3, y: game.dimensions.y*7/8}, pt2: {x:game.dimensions.x*7/8, y:game.dimensions.y*7/8} },
         ],
 
         circles: [
@@ -116,9 +116,21 @@ var Game = (function(game) {
           //line above weapon info text
           { pt1: { x: 0, y: game.dimensions.y}, pt2: {x:game.dimensions.x, y:game.dimensions.y} },
 
-          // middle lines
-          { pt1: { x: game.dimensions.x/8, y: game.dimensions.y/3}, pt2: {x:game.dimensions.x/3, y:game.dimensions.y/3} },
-          { pt1: { x: game.dimensions.x*2/3, y: game.dimensions.y/3}, pt2: {x:game.dimensions.x*7/8, y:game.dimensions.y/3} },
+          // high line
+          // { pt1: { x: game.dimensions.x/8, y: game.dimensions.y/3}, pt2: {x:game.dimensions.x/3, y:game.dimensions.y/3} },
+          { pt1: { x: game.dimensions.x*5/8, y: game.dimensions.y*3/8}, pt2: {x:game.dimensions.x*7/8, y:game.dimensions.y*3/8} },
+
+          // highish line
+          { pt1: { x: game.dimensions.x/2, y: game.dimensions.y/2}, pt2: {x:game.dimensions.x*3/4, y:game.dimensions.y/2} },
+
+          // middle line
+          { pt1: { x: game.dimensions.x*3/8, y: game.dimensions.y*5/8}, pt2: {x:game.dimensions.x*5/8, y:game.dimensions.y*5/8} },
+
+          // lowish line
+          { pt1: { x: game.dimensions.x*1/4, y: game.dimensions.y*3/4}, pt2: {x:game.dimensions.x/2, y:game.dimensions.y*3/4} },
+
+          // low lines
+          { pt1: { x: game.dimensions.x/8, y: game.dimensions.y*7/8}, pt2: {x:game.dimensions.x*3/8, y:game.dimensions.y*7/8} },
         ],
 
         circles: [],
@@ -148,6 +160,13 @@ var Game = (function(game) {
 
           //evil line
           { pt1: { x: 0, y: game.dimensions.y/3}, pt2: {x:game.dimensions.x, y:game.dimensions.y/3} }, 
+
+          // lowish line
+          { pt1: { x: game.dimensions.x/3, y: game.dimensions.y*3/4}, pt2: {x:game.dimensions.x*2/3, y:game.dimensions.y*3/4} },
+
+          // low lines
+          { pt1: { x: game.dimensions.x/8, y: game.dimensions.y*7/8}, pt2: {x:game.dimensions.x*3/8, y:game.dimensions.y*7/8} },
+          { pt1: { x: game.dimensions.x*5/8, y: game.dimensions.y*7/8}, pt2: {x:game.dimensions.x*7/8, y:game.dimensions.y*7/8} },
         ],
 
         circles: [],

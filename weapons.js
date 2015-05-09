@@ -18,6 +18,11 @@ Weapon.prototype = {
       this.last_fired = world.time;
       this.rounds_remaining--;
     }
+    else
+    {
+      world.projectiles = world.projectiles.concat(new Blank(center, velocity));
+      this.last_fired = world.time;
+    }
   }
 };
 
@@ -26,7 +31,7 @@ Weapon.prototype = {
 ///*******************///
 // Fishes shoot blanks.... duh
 function Fish() {
-  return new Weapon(Blank, 10000, 0, "Fish", "black", "-");
+  return new Weapon(Blank, 10, 0, "Blanks", "black", "-");
 };
 
 function Pistol() {
@@ -55,15 +60,31 @@ function FlameThrower() {
 var Blank = function(center,velocity) {
   this.center = center;
   this.velocity = velocity;
-  this.exists = false;
-  this.damage = 0;
+  this.size = {x: 2, y: 2};
+  this.exists = true;
+  this.gravity = 0.0;
+  this.air_resist = 0.0;
+  this.damage = 15;
+  this.floor = 10000;
+  this.lifespan = 4;
+  this.age = 0;
 };
 
 Blank.prototype = {
   update: function(world) {
+    this.age += 1;
+    if (this.age > this.lifespan)
+    {
+      this.exists = false;
+      return;
+    }
   },
 
   draw: function(screen) {
+    screen.beginPath();
+    screen.fillStyle="gray";
+    screen.fillRect(this.center.x - this.size.x / 2+this.age, this.center.y - this.size.y / 2, this.size.x, this.size.y);
+    screen.fillRect(this.center.x - this.size.x / 2-this.age, this.center.y - this.size.y / 2, this.size.x, this.size.y);
   }
 };
 

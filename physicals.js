@@ -162,10 +162,8 @@ var Game = (function (game){
           }
         }
 
-
         // if we're falling, check to see if we fall through a line
         physics.updateFloor(world, this);
-
 
         // Key presses
         // If left cursor key is down...
@@ -316,7 +314,10 @@ var Game = (function (game){
       this.age += 1;
       if (this.age > this.lifespan){ 
         this.exists = false;
+        return;
       }
+
+      physics.updateFloor(world, this);
     },
 
     draw: function(screen) {
