@@ -13,6 +13,13 @@ var Weapon = function(bullet, reload_time, capacity, name, color, symbol) {
 
 Weapon.prototype = {
   fire: function(center, velocity, world) {
+    //console.log("Firing", this.name)
+    if (this.name == "Shield"){
+      console.log("Making shield")
+      world.lines = world.lines.concat(new this.bullet(center, velocity));
+      this.last_fired = world.time;
+      return;
+    }
     if (this.capacity == 0 || this.rounds_remaining > 0){
       world.projectiles = world.projectiles.concat(new this.bullet(center, velocity));
       this.last_fired = world.time;
@@ -53,6 +60,10 @@ function MultiMissileLauncher() {
 function FlameThrower() {
   return new Weapon(Flame, 3, 75, "Flamethrower", "red", "F");
 };
+
+function ShieldGun() {
+  return new Weapon(Shield, 300, 0, "Shield", "blue", "C")
+}
 
 ///***********************///
 //****** PROJECTILES ******//
@@ -189,6 +200,32 @@ var MultiMissile = function(center, velocity) {
   } 
   // console.log("Returning:", childMissiles)
   return childMissiles;
+};
+
+
+var Shield = function(center, velocity) {
+  this.center = center;
+  this.velocity = {x: 0, y: 0};
+  this.type = "Shield"
+  this.numFaces = 7;
+  this.deltaAngle = Math.PI/7
+  this.radius = 30;
+  this.lifespan = 100;
+  var shieldLines = [];
+  var angle = 0
+  for (var i=0; i<this.numFaces; i++){
+    // var angle = this.deltaAngle * i;
+    var pt1 = {x: this.center.x+Math.cos(angle)*this.radius, y: this.center.y+Math.sin(angle)*this.radius};
+    var angle2 = angle-this.deltaAngle;
+    var pt2 = {x: this.center.x+Math.cos(angle2)*this.radius, y: this.center.y+Math.sin(angle2)*this.radius};
+    var line = new Line({pt1: pt1, pt2: pt2});
+    line.color = "#58ACFA";
+    line.lifespan = this.lifespan;
+    shieldLines.push(line);
+    angle = angle2;
+  } 
+  // console.log("Returning:", childMissiles)
+  return shieldLines;
 };
 
 

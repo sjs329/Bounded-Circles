@@ -100,29 +100,38 @@ var Game = (function (game){
     }
   };
 
-  // **makeLine()** creates a line
-  game.Line = function( args ) { // pt1, pt2) {
-    // console.log(args)
-    this.end1 = args.pt1;
-    this.end2 = args.pt2;
-    this.len = trig.distance(this.end1, this.end2);
-  };
+  // // **makeLine()** creates a line
+  // game.Line = function( args ) { // pt1, pt2) {
+  //   // console.log(args)
+  //   this.end1 = args.pt1;
+  //   this.end2 = args.pt2;
+  //   this.color = "black";
+  //   this.lifespan = 0;
+  //   this.age = 0;
+  //   this.exists = true;
+  //   this.len = trig.distance(this.end1, this.end2);
+  // };
 
-  game.Line.prototype = {
-    // The line has its own built-in `draw()` function.  This allows
-    // the main `draw()` to just polymorphicly call `draw()` on circles and lines.
-    draw: function(screen) {
+  // game.Line.prototype = {
+  //   update: function(world) {
+  //     this.age += 1;
+  //     if (this.lifespan > 0 && this.age > this.lifespan)
+  //       this.exists = false;
+  //   },
+  //   // The line has its own built-in `draw()` function.  This allows
+  //   // the main `draw()` to just polymorphicly call `draw()` on circles and lines.
+  //   draw: function(screen) {
 
-      screen.beginPath();
-      screen.lineWidth = 1.5;
-      screen.moveTo(this.end1.x, this.end1.y);
-      screen.lineTo(this.end2.x, this.end2.y);
-      screen.closePath();
+  //     screen.beginPath();
+  //     screen.lineWidth = 1.5;
+  //     screen.moveTo(this.end1.x, this.end1.y);
+  //     screen.lineTo(this.end2.x, this.end2.y);
+  //     screen.closePath();
 
-      screen.strokeStyle = "black";
-      screen.stroke();
-    }
-  };
+  //     screen.strokeStyle = this.color;
+  //     screen.stroke();
+  //   }
+  // };
 
   // ------
 
@@ -143,10 +152,10 @@ var Game = (function (game){
     this.keyboarder = new Keyboarder();
 
     this.primaryWeapon = Pistol();
-    // this.primaryWeapon = MultiMissileLauncher();
     this.secondaryWeapon = Fish();
     this.secretWeapon = FlameThrower();
     this.secretWeapon.capacity = 0;
+    this.shield = ShieldGun();
   };
 
   game.Player.prototype = {
@@ -216,6 +225,13 @@ var Game = (function (game){
           if (this.keyboarder.isDown(this.keyboarder.KEYS.SIX))
           {
             this.secretWeapon.fire({ x: this.center.x, y: this.center.y - this.size.y - this.size.y/3 }, { x: 0, y: -1 }, world);
+          }
+        }
+        if (world.time - this.shield.last_fired >= this.shield.reload_time)
+        {
+          if (this.keyboarder.isDown(this.keyboarder.KEYS.I))
+          {
+            this.shield.fire({ x: this.center.x, y: this.center.y }, { x: 0, y: 0 }, world);
           }
         }
 
@@ -459,6 +475,7 @@ var Game = (function (game){
       screen.fillStyle = this.color;
       screen.fillRect(this.center.x - this.size.x / 2, this.center.y - this.size.y / 2, this.size.x*this.percent, this.size.y);
       screen.beginPath();
+      screen.strokeStyle = "black"
       screen.rect(this.center.x - this.size.x / 2, this.center.y - this.size.y / 2, this.size.x, this.size.y);
       screen.stroke();
     }

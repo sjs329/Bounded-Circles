@@ -46,6 +46,8 @@ var Game = (function(game) {
       primaryReloadBar: {},
       secondaryWeaponText: "",
       secondaryReloadBar: {},
+      shieldText: "",
+      shieldReloadBar: {},
 
       time: 0,
       running: false,
@@ -167,10 +169,17 @@ var Game = (function(game) {
                                      0,
                                      {style: "15px Courier", align: "left", color: "black"} )
     world.secondaryReloadBar = new game.FillBar({x: game.dimensions.x/2 + 215, y: game.dimensions.y+40}, {x: 100, y: 12}, "gray", 0.0);
+    world.shieldText = new game.Text("Shield",
+                                     {x: 5, y: 15},
+                                     0,
+                                     {style: "15px Courier", align: "left", color: "black"} )
+    world.shieldReloadBar = new game.FillBar({x: 55, y: 28}, {x: 100, y: 12}, "#58ACFA", 0.0);
     world.misc.push(world.primaryWeaponText);
     world.misc.push(world.primaryReloadBar);
     world.misc.push(world.secondaryWeaponText);
     world.misc.push(world.secondaryReloadBar);
+    world.misc.push(world.shieldText);
+    world.misc.push(world.shieldReloadBar);
 
     // game logic vars
     world.time = 0;
@@ -182,7 +191,7 @@ var Game = (function(game) {
   {
     for (var i=0; i<lines.length; i++)
     {
-      world.lines.push(new game.Line(lines[i]));
+      world.lines.push(new Line(lines[i]));
     }
   };
 
@@ -216,15 +225,13 @@ var Game = (function(game) {
   // **update()** updates the state of the lines and circles.
   game.update = function(world) {
 
-    // console.log(world.circles)
     //remove anything that's off screen
     world.circles = world.circles.filter(world.stillOnTheCanvas);
     world.projectiles = world.projectiles.filter(world.stillOnTheCanvas);
     world.misc = world.misc.filter(world.stillOnTheCanvas);
-    // console.log(world.projectiles)
     world.persistant = world.persistant.filter(world.stillOnTheCanvas);
 
-
+    // update physical bodies
     var bodies = [world.player].concat(world.projectiles).concat(world.misc).concat(world.persistant).concat(world.circles);
     for (var i = 0; i < bodies.length; i++) {
       physics.applyGravity(bodies[i]);
@@ -233,7 +240,14 @@ var Game = (function(game) {
       bodies[i].update(world);
     }
 
+    // update lines - shields are made of lines, which can move and die
+    for (var i = 0; i< world.lines.length; i++)
+    {
+      world.lines[i].update(world);
+    }
+
     //remove anything that no longer exists
+    world.lines = world.lines.filter(world.stillExists);
     world.circles = world.circles.filter(world.stillExists);
     world.projectiles = world.projectiles.filter(world.stillExists);
     world.misc = world.misc.filter(world.stillExists);
@@ -247,8 +261,9 @@ var Game = (function(game) {
     world.primaryReloadBar.setPercent((world.time - world.player.primaryWeapon.last_fired)/world.player.primaryWeapon.reload_time);
     world.secondaryWeaponText.setText("Secondary Weapon: "+world.player.secondaryWeapon.name+"\nRounds Remaining: "+(world.player.secondaryWeapon.capacity > 0 ? world.player.secondaryWeapon.rounds_remaining : "Infinite")+"\nReload Time:");
     world.secondaryReloadBar.setPercent((world.time - world.player.secondaryWeapon.last_fired)/world.player.secondaryWeapon.reload_time);
+    world.shieldReloadBar.setPercent((world.time - world.player.shield.last_fired)/world.player.shield.reload_time);
+
     world.time += 1;
-    
   };
 
   // **draw()** draws everything

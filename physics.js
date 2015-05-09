@@ -1,6 +1,38 @@
 // Physics functions for calculating circle movement
 // -----------------------------------------------
 
+Line = function( args ) { // pt1, pt2) {
+    // console.log(args)
+    this.end1 = args.pt1;
+    this.end2 = args.pt2;
+    this.color = "black";
+    this.lifespan = 0;
+    this.age = 0;
+    this.exists = true;
+    this.len = trig.distance(this.end1, this.end2);
+  };
+
+Line.prototype = {
+    update: function(world) {
+      this.age += 1;
+      if (this.lifespan > 0 && this.age > this.lifespan)
+        this.exists = false;
+    },
+    // The line has its own built-in `draw()` function.  This allows
+    // the main `draw()` to just polymorphicly call `draw()` on circles and lines.
+    draw: function(screen) {
+
+      screen.beginPath();
+      screen.lineWidth = 1.5;
+      screen.moveTo(this.end1.x, this.end1.y);
+      screen.lineTo(this.end2.x, this.end2.y);
+      screen.closePath();
+
+      screen.strokeStyle = this.color;
+      screen.stroke();
+    }
+  };
+
 var physics = {
 
   // **applyGravity()** adds gravity to the velocity of `circle`.
