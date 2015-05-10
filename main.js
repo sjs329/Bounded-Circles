@@ -232,7 +232,8 @@ var Game = (function(game) {
     world.persistant = world.persistant.filter(world.stillOnTheCanvas);
 
     // update physical bodies
-    var bodies = [world.player].concat(world.projectiles).concat(world.misc).concat(world.persistant).concat(world.circles);
+    // var bodies = [world.player].concat(world.projectiles).concat(world.misc).concat(world.persistant).concat(world.circles);
+    var bodies = world.projectiles.concat(world.misc).concat(world.persistant).concat(world.circles).concat(world.player);
     for (var i = 0; i < bodies.length; i++) {
       physics.applyGravity(bodies[i]);
       physics.applyAirResistance(bodies[i]);
