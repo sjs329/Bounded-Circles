@@ -50,7 +50,7 @@ function SMG() {
 };
 
 function MissileLauncher() {
-  return new Weapon(Missile, 20, 10, "Missile Launcher", "#0B610B", "M");
+  return new Weapon(Missile, 20, 10, "Missile Launcher", "#00FFBF", "M");
 };
 
 function MultiMissileLauncher() {
