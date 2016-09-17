@@ -93,7 +93,7 @@ var Game = (function (game){
         }
         else if (rand < 0.8)
         {
-          weapon = MiniGun;
+          weapon = GatlingGun;
         }
         else
         {

@@ -114,8 +114,8 @@ function SMG(world) {
   return new Weapon(Bullet, 5, 150, "SMG", "gray", "S", world);
 };
 
-function MiniGun(world) {
-  return new OverheatableWeapon(Bullet, 2 , 300, 400, 0.75, "MiniGun", "yellow", "G", world);
+function GatlingGun(world) {
+  return new OverheatableWeapon(Bullet, 2 , 300, 400, 0.75, "Gatling Gun", "yellow", "G", world);
 };
 
 function MissileLauncher(world) {
