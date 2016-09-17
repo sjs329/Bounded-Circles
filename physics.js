@@ -37,18 +37,22 @@ var physics = {
 
   // **applyGravity()** adds gravity to the velocity of `circle`.
   applyGravity: function(body) {
+    if (typeof body.gravity == 'undefined') return;
     body.velocity.y += body.gravity;
   },
 
   applyAirResistance: function(body) {
+    if (typeof body.air_resist == 'undefined') return;
     if (body.velocity.x == 0 && body.velocity.y == 0) return;
     var speed = matrix.magnitude(body.velocity)
     var accel = body.air_resist * speed*speed;
     body.velocity = matrix.add(body.velocity, matrix.multiply(matrix.unitVector(matrix.multiply(body.velocity, -1)), accel));
+
   },
 
   // **moveBody()** adds the velocity of the body to its center.
   moveBody: function(body) {
+    if (typeof body.velocity == 'undefined') return;
     body.center.x += body.velocity.x;
     if (body.velocity.y < 0 || body.center.y < body.floor) {
       body.center.y += body.velocity.y;

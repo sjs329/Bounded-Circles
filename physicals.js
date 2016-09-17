@@ -83,19 +83,23 @@ var Game = (function (game){
       if (Math.random() < this.powerup_probablity) {
         var rand = Math.random()
         var weapon;
-        if (rand < 0.5)
+        if (rand < 0.3)
         {
           weapon = FlameThrower;
         }
-        else if (rand < 0.8)
+        else if (rand < 0.6)
         {
           weapon = MissileLauncher;
+        }
+        else if (rand < 0.8)
+        {
+          weapon = MiniGun;
         }
         else
         {
           weapon = MultiMissileLauncher;
         }
-        world.misc.push(new game.Powerup(this.gameSize, {x: this.center.x, y: this.center.y}, {x: 0, y: 0.1}, weapon));
+        world.misc.push(new game.Powerup(this.gameSize, {x: this.center.x, y: this.center.y}, {x: 0, y: 0.1}, weapon, world));
       }
     }
   };
@@ -153,6 +157,7 @@ var Game = (function (game){
 
     this.primaryWeapon = Pistol();
     this.secondaryWeapon = Fish();
+    this.secondaryWeaponTemp = new game.FillBar({x: this.center.x, y: this.center.y-11}, {x: 15, y: 3}, 'red', 0, false)
     this.secretWeapon = FlameThrower();
     this.secretWeapon.capacity = 0;
     this.shield = ShieldGun();
@@ -294,6 +299,12 @@ var Game = (function (game){
         screen.fillRect(this.center.x - this.size.x / 2, this.center.y - this.size.y / 2,
                       this.size.x, this.size.y);
       }
+
+      if (typeof this.secondaryWeapon.temperature !== 'undefined') {
+        this.secondaryWeaponTemp.center = {x: this.center.x, y: this.center.y-11};
+        this.secondaryWeaponTemp.setPercent(this.secondaryWeapon.temperature / this.secondaryWeapon.heat_capacity)
+        this.secondaryWeaponTemp.draw(screen)
+      }
     }, 
 
     explode: function(world) {
@@ -344,13 +355,13 @@ var Game = (function (game){
   };
 
   // this is a misc type
-  game.Powerup = function(dimensions, center, velocity, weapon) {
+  game.Powerup = function(dimensions, center, velocity, weapon, world) {
     this.center = center;
     this.radius = 12;
     this.size = { x: 14 , y: 14 };
     this.velocity = velocity;
     this.weapon = weapon;
-    this.weaponProto = new this.weapon();
+    this.weaponProto = new this.weapon(world);
     this.lifespan = 400;
     this.exists = true;
     this.age = 0;
@@ -370,7 +381,7 @@ var Game = (function (game){
         var rand = Math.random();
         if (rand < 0.05)
         {
-          world.player.secondaryWeapon = new Fish();
+          world.player.secondaryWeapon = new Fish(world);
         }
         else
         {
@@ -378,8 +389,16 @@ var Game = (function (game){
           if (world.player.secondaryWeapon.name == this.weaponProto.name) {
             newRoundsRemaining += world.player.secondaryWeapon.rounds_remaining;
           }
-          world.player.secondaryWeapon = new this.weapon();
+          if (typeof world.player.secondaryWeapon.exists !== 'undefined') 
+          {
+            world.player.secondaryWeapon.exits = false; //this will let the old gun get filtered from world.misc
+          }
+          world.player.secondaryWeapon = new this.weapon(world);
           world.player.secondaryWeapon.rounds_remaining = newRoundsRemaining; // this can make the rounds remaining greater than the capacity. but that should be fine....
+          if (typeof world.player.secondaryWeapon.exists !== 'undefined') 
+          {
+            world.misc.push(world.player.secondaryWeapon);
+          }
         }
         this.exists = false;
       }
@@ -443,7 +462,7 @@ var Game = (function (game){
     }
   };
 
-  game.FillBar = function(center, size, color, percent) {
+  game.FillBar = function(center, size, color, percent, draw_border=false) {
     this.center = center;
     this.size = size;
     this.color = color;
@@ -454,6 +473,7 @@ var Game = (function (game){
     this.gravity = 0.0;
     this.air_resist = 0.0;
     this.floor = 10000;
+    this.draw_border = draw_border;
   };
 
   game.FillBar.prototype = {
@@ -474,10 +494,12 @@ var Game = (function (game){
     draw: function(screen) {
       screen.fillStyle = this.color;
       screen.fillRect(this.center.x - this.size.x / 2, this.center.y - this.size.y / 2, this.size.x*this.percent, this.size.y);
-      screen.beginPath();
-      screen.strokeStyle = "black"
-      screen.rect(this.center.x - this.size.x / 2, this.center.y - this.size.y / 2, this.size.x, this.size.y);
-      screen.stroke();
+      if (this.draw_border) {
+        screen.beginPath();
+        screen.strokeStyle = "black"
+        screen.rect(this.center.x - this.size.x / 2, this.center.y - this.size.y / 2, this.size.x, this.size.y);
+        screen.stroke();
+      }
     }
   };
 

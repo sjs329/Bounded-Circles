@@ -1,6 +1,6 @@
 
-// Generic (meta) weapon. Actual weapons are defined below
-var Weapon = function(bullet, reload_time, capacity, name, color, symbol) {
+// Generic (meta) weapons. Actual weapons are defined below
+var Weapon = function(bullet, reload_time, capacity, name, color, symbol, world) {
   this.reload_time = reload_time;
   this.bullet = bullet;
   this.capacity = capacity;
@@ -33,36 +33,105 @@ Weapon.prototype = {
   }
 };
 
+// Special weapon.
+var OverheatableWeapon = function(bullet, reload_time, capacity, heat_capacity, cooling_per_tick, name, color, symbol, world) {
+  this.reload_time = reload_time;
+  this.bullet = bullet;
+  this.capacity = capacity;
+  this.heat_capacity = heat_capacity;
+  this.cooling_per_tick = cooling_per_tick;
+  this.temperature = 0;
+  this.name_base = name;
+  this.name = name;
+  this.color = color;   // Color and symbol are used when drawing powerups of this weapon
+  this.symbol = symbol; // a character to print on the powerup
+  this.last_fired = -this.reload_time;
+  this.rounds_remaining = this.capacity;  // Note that it's possible to have rounds_remaining > capacity since picking up the same gun adds ammo
+  this.exists = true; // needed so it doesn't get filtered out of the world by world.stillExists
+  this.center = { x: 1, y: 1 }; // needed so it doesn't get filtered out of the world by world.stillOnCanvas
+};
+
+OverheatableWeapon.prototype = {
+  fire: function(center, velocity, world) {
+    //console.log("Firing", this.name)
+    if (this.name == "Shield"){
+      console.log("Making shield")
+      world.lines = world.lines.concat(new this.bullet(center, velocity));
+      this.last_fired = world.time;
+      return;
+    }
+    if ((this.capacity == 0 || this.rounds_remaining > 0) && this.temperature < this.heat_capacity){
+      new_bullet = new this.bullet(center, velocity);
+      world.projectiles = world.projectiles.concat(new_bullet);
+      this.last_fired = world.time;
+      this.rounds_remaining--;
+      this.temperature += new_bullet.heating;
+    }
+    else
+    {
+      world.projectiles = world.projectiles.concat(new Blank(center, velocity));
+      this.last_fired = world.time;
+      
+
+    }
+  },
+
+  update: function(world) {
+    if (this.temperature > 0)
+    {
+      this.temperature -= this.cooling_per_tick;
+    }
+    else
+    {
+      this.temperature = 0;
+    }
+    if (this.temperature >= this.heat_capacity - (this.heat_capacity/10)) {
+      this.name = this.name_base + '(OVERHEATING)';
+    }
+    else {
+      this.name = this.name_base;
+    }
+  },
+
+  draw: function(screen) {
+    return;
+  }
+};
+
 ///*******************///
 ///***** WEAPONS *****///
 ///*******************///
 // Fishes shoot blanks.... duh
-function Fish() {
-  return new Weapon(Blank, 10, 0, "Blanks", "black", "-");
+function Fish(world) {
+  return new Weapon(Blank, 10, 0, "Blanks", "black", "-", world);
 };
 
-function Pistol() {
-  return new Weapon(Bullet, 10, 0, "Pistol", "purple", "P");
+function Pistol(world) {
+  return new Weapon(Bullet, 10, 0, "Pistol", "purple", "P", world);
 };
 
-function SMG() {
-  return new Weapon(Bullet, 5, 150, "SMG", "gray", "S");
+function SMG(world) {
+  return new Weapon(Bullet, 5, 150, "SMG", "gray", "S", world);
 };
 
-function MissileLauncher() {
-  return new Weapon(Missile, 20, 10, "Missile Launcher", "#00FFBF", "M");
+function MiniGun(world) {
+  return new OverheatableWeapon(Bullet, 2 , 300, 800, 2, "MiniGun", "yellow", "G", world);
 };
 
-function MultiMissileLauncher() {
-  return new Weapon(MultiMissile, 40, 5, "Multi-Missile Launcher", "orange", "Q");
+function MissileLauncher(world) {
+  return new Weapon(Missile, 20, 10, "Missile Launcher", "#00FFBF", "M", world);
 };
 
-function FlameThrower() {
-  return new Weapon(Flame, 3, 75, "Flamethrower", "red", "F");
+function MultiMissileLauncher(world) {
+  return new Weapon(MultiMissile, 40, 5, "Multi-Missile Launcher", "orange", "Q", world);
 };
 
-function ShieldGun() {
-  return new Weapon(Shield, 300, 0, "Shield", "blue", "C")
+function FlameThrower(world) {
+  return new Weapon(Flame, 3, 75, "Flamethrower", "red", "F", world);
+};
+
+function ShieldGun(world) {
+  return new Weapon(Shield, 300, 0, "Shield", "blue", "C", world);
 }
 
 ///***********************///
@@ -114,6 +183,7 @@ var Bullet = function(center, velocity) {
   this.damage = 15;
   this.exists = true; //this gets set to false when this bullet hits something
   this.floor = 10000;
+  this.heating = 10; //overheatable weapon heats this much per round
 };
 
 Bullet.prototype = {
