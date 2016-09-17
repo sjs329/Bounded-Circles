@@ -115,7 +115,7 @@ function SMG(world) {
 };
 
 function MiniGun(world) {
-  return new OverheatableWeapon(Bullet, 2 , 300, 800, 2, "MiniGun", "yellow", "G", world);
+  return new OverheatableWeapon(Bullet, 2 , 300, 400, 0.75, "MiniGun", "yellow", "G", world);
 };
 
 function MissileLauncher(world) {
