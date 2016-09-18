@@ -6,7 +6,7 @@ var Game = (function(game) {
 
   var max_speed = 7;
   var min_speed = -3.5;
-  var NUM_LIVES = 5;
+  var MAX_LIVES = 5;
   var INITIAL_KILL_MULTIPLIER = 10;
   // var num_circles = 8;
   // var game.screen;
@@ -55,7 +55,8 @@ var Game = (function(game) {
       running: false,
       level: 0,
       init: false,
-      lives: NUM_LIVES,
+      lives: MAX_LIVES,
+      max_lives: MAX_LIVES,
       score: 0,
       level_score: 0,
       kill_multiplier: INITIAL_KILL_MULTIPLIER,
@@ -149,7 +150,7 @@ var Game = (function(game) {
   game.reset = function(world, level, lives) {
     if (level < 0 || level >= game.levels.length) level = 0; // make sure this level exists
     world.level = level;
-    world.lives = lives || NUM_LIVES;
+    world.lives = lives || MAX_LIVES;
     world.kill_multiplier = INITIAL_KILL_MULTIPLIER+1;
     world.level_score = 0;
 

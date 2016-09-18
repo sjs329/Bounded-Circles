@@ -125,7 +125,11 @@ function FlameThrower(world) {
 
 function ShieldGun(world) {
   return new Weapon(Shield, 300, 0, "Shield", "blue", "C", world);
-}
+};
+
+function NewLife(world) {
+  return new Weapon(Blank, 0, 0, "Life", "pink", "1", world);
+};
 
 ///***********************///
 //****** PROJECTILES ******//

@@ -85,20 +85,22 @@ var Game = (function (game){
       if (Math.random() < this.powerup_probablity) {
         var rand = Math.random()
         var weapon;
-        if (rand < 0.3)
-        {
+        if (rand < 0.20) {
+          if (world.lives < world.max_lives)
+            weapon = NewLife;
+          else
+            weapon = SMG
+        }
+        else if (rand < 0.4) {
           weapon = FlameThrower;
         }
-        else if (rand < 0.6)
-        {
+        else if (rand < 0.6) {
           weapon = MissileLauncher;
         }
-        else if (rand < 0.8)
-        {
+        else if (rand < 0.8) {
           weapon = GatlingGun;
         }
-        else
-        {
+        else {
           weapon = MultiMissileLauncher;
         }
         world.misc.push(new game.Powerup(this.gameSize, {x: this.center.x, y: this.center.y}, {x: 0, y: 0.1}, weapon, world));
@@ -176,7 +178,7 @@ var Game = (function (game){
             this.explode(world);
             if (typeof this.secondaryWeapon.temperature !== 'undefined')
               this.secondaryWeapon.temperature = 0; //make sure the temp bar goes away
-            
+
             return;
           }
         }
@@ -396,6 +398,13 @@ var Game = (function (game){
       if (world.player.alive && trig.distance(this.center, world.player.center) <= this.radius + world.player.size.x/2) 
       {
         var rand = Math.random();
+        if (this.weaponProto.name == 'Life') {
+          if (world.lives < world.max_lives) {
+            world.lives++;
+          }
+          this.exists = false;
+          return;
+        }
         if (rand < 0.05)
         {
           world.player.secondaryWeapon = new Fish(world);
