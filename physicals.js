@@ -463,7 +463,7 @@ var Game = (function (game){
     }
   };
 
-  game.FillBar = function(center, size, color, percent, draw_border=false) {
+  game.FillBar = function(center, size, color, percent, draw_border) {
     this.center = center;
     this.size = size;
     this.color = color;
@@ -474,7 +474,7 @@ var Game = (function (game){
     this.gravity = 0.0;
     this.air_resist = 0.0;
     this.floor = 10000;
-    this.draw_border = draw_border;
+    this.draw_border = draw_border || false;
   };
 
   game.FillBar.prototype = {
