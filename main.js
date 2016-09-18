@@ -57,6 +57,7 @@ var Game = (function(game) {
       init: false,
       lives: NUM_LIVES,
       score: 0,
+      level_score: 0,
       kill_multiplier: INITIAL_KILL_MULTIPLIER,
 
       stillOnTheCanvas: function(body) {
@@ -81,7 +82,7 @@ var Game = (function(game) {
       game.update(world);
 
       if (!world.player.alive && world.running) {
-        printScoreText("infinity", "black", world);
+        printScoreText(world.score+world.level_score, "black", world);
         // printMainText("You Lose! :(", "red", world);
         if (world.lives > 1) {
           printMainText("Ouch! :(", "red", world);
@@ -95,7 +96,7 @@ var Game = (function(game) {
       }
 
       if (world.circles.length == 0 && world.running){
-        printScoreText(world.score, "black", world);
+        printScoreText(world.score+world.level_score, "black", world);
         printMainText("You Win! :)", "blue", world);
         if (world.level == game.levels.length-1) 
         {
@@ -146,6 +147,7 @@ var Game = (function(game) {
     world.level = level;
     world.lives = lives || NUM_LIVES;
     world.kill_multiplier = INITIAL_KILL_MULTIPLIER+1;
+    world.level_score = 0;
 
     // Clear arrays
     world.misc.length = 0;
@@ -299,7 +301,7 @@ var Game = (function(game) {
     world.secondaryWeaponText.setText("Secondary Weapon: "+world.player.secondaryWeapon.name+"\nRounds Remaining: "+(world.player.secondaryWeapon.capacity > 0 ? world.player.secondaryWeapon.rounds_remaining : "Infinite")+"\nReload Time:");
     world.secondaryReloadBar.setPercent((world.time - world.player.secondaryWeapon.last_fired)/world.player.secondaryWeapon.reload_time);
     world.shieldReloadBar.setPercent((world.time - world.player.shield.last_fired)/world.player.shield.reload_time);
-    world.scoreText.setText(world.score.toFixed(0));
+    world.scoreText.setText((world.score+world.level_score).toFixed(0));
     world.scoreMultiplier.setText(world.kill_multiplier.toFixed(0));
     if (world.kill_multiplier > 1)
       world.scoreMultiplierBar.setPercent((300-world.time%300)/300);

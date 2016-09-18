@@ -23,7 +23,7 @@ var Game = (function (game){
       if (this.health <= 0) {
         this.explode(world);
         this.exists = false;
-        world.score += world.kill_multiplier;
+        world.level_score += world.kill_multiplier;
         return; //don't need to check for bounces
       }
 
@@ -248,8 +248,9 @@ var Game = (function (game){
             world.score = 0;
             game.reset(world, 0);
           }
-          else
+          else {
             game.reset(world, world.level, world.lives);
+          }
         }
       }
       
@@ -271,8 +272,10 @@ var Game = (function (game){
           if (this.keyboarder.isDown(this.keyboarder.KEYS.N))
           {
             var next_level = world.level + 1;
-            if (next_level < game.levels.length)
+            if (next_level < game.levels.length) {
+              world.score += world.level_score;
               game.reset(world, world.level + 1, world.lives);
+            }
             else
               console.log("No more levels!");
           }
