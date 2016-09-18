@@ -253,7 +253,8 @@ var Game = (function (game){
       {
         if (this.keyboarder.isDown(this.keyboarder.KEYS.R))
         {
-          game.reset(world, 0);
+          // game.reset(world, 0);
+          game.reset(world, world.level);
         }
         if (world.player.alive) //we won!
         {
