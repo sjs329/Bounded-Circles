@@ -59,6 +59,7 @@ var Game = (function(game) {
       score: 0,
       level_score: 0,
       kill_multiplier: INITIAL_KILL_MULTIPLIER,
+      high_score: 0,
 
       stillOnTheCanvas: function(body) {
         return body.center.x > 0 && body.center.x < game.screen.canvas.width &&
@@ -97,13 +98,15 @@ var Game = (function(game) {
 
       if (world.circles.length == 0 && world.running){
         printScoreText(world.score+world.level_score, "black", world);
-        printMainText("You Win! :)", "blue", world);
+        
         if (world.level == game.levels.length-1) 
         {
+          printMainText("You Win! :)", "blue", world);
           printSubText("(That was the last level! Press 'R' to restart the game)", "black", world);
         }
         else
         {
+          printMainText("Level defeated! :)", "blue", world);
           printSubText("(Press 'N' to go to the next level, 'R' to play this one again)", "black", world);
         }
         world.running = false;
@@ -122,9 +125,10 @@ var Game = (function(game) {
       font = { style: "50px Verdana", align: "center", color: "black" };
       // console.log(world);
       world.misc.push(new game.Text("Score: "+score, {x: game.dimensions.x/2, y: game.dimensions.y/4+10}, 0, font));
+      if (score > world.high_score) world.high_score = score;
 
-      font = {style: "10px Verdana", align: "center", color: "black" };
-      // world.misc.push(new game.Text("It's golf scoring - lower is better", {x: game.dimensions.x/2,y: game.dimensions.y/4+40}, 0, font));
+      font = {style: "20px Verdana", align: "center", color: "black" };
+      world.misc.push(new game.Text("High Score: "+world.high_score, {x: game.dimensions.x/2,y: game.dimensions.y/4+40}, 0, font));
     };
 
     function printMainText(text, color, world) {
