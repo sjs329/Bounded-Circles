@@ -174,6 +174,9 @@ var Game = (function (game){
           if (trig.distance(this.center, world.circles[i].center) <= (world.circles[i].radius+this.size.x/2)) {
             this.alive = false; //we're dead!
             this.explode(world);
+            if (typeof this.secondaryWeapon.temperature !== 'undefined')
+              this.secondaryWeapon.temperature = 0; //make sure the temp bar goes away
+            
             return;
           }
         }

@@ -106,7 +106,7 @@ var Game = (function(game) {
         }
         else
         {
-          printMainText("Level defeated! :)", "blue", world);
+          printMainText("Level "+(world.level+1)+" defeated! :)", "blue", world);
           printSubText("(Press 'N' to go to the next level, 'R' to play this one again)", "black", world);
         }
         world.running = false;
