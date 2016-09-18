@@ -23,6 +23,7 @@ var Game = (function (game){
       if (this.health <= 0) {
         this.explode(world);
         this.exists = false;
+        world.score += world.kill_multiplier;
         return; //don't need to check for bounces
       }
 
@@ -56,6 +57,7 @@ var Game = (function (game){
     // the main `draw()` to just polymorphicly call `draw()` on circles and lines.
     draw: function(screen) {
       screen.beginPath();
+      screen.strokeStyle = "black"
       screen.arc(this.center.x, this.center.y, this.radius, 0, Math.PI * 2, true);
       screen.closePath();
       screen.stroke();
@@ -242,8 +244,10 @@ var Game = (function (game){
 
         if (this.keyboarder.isDown(this.keyboarder.KEYS.R))
         {
-          if (world.level == game.levels.length-1) //if it's the last level, start over
+          if (world.level == game.levels.length-1) { //if it's the last level, start over
+            world.score = 0;
             game.reset(world, 0);
+          }
           else
             game.reset(world, world.level, world.lives);
         }
@@ -258,6 +262,7 @@ var Game = (function (game){
             game.reset(world, world.level, world.lives);
           }
           else {
+            world.score = 0;
             game.reset(world, 0);
           }
         }

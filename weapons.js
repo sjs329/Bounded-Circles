@@ -53,13 +53,6 @@ var OverheatableWeapon = function(bullet, reload_time, capacity, heat_capacity, 
 
 OverheatableWeapon.prototype = {
   fire: function(center, velocity, world) {
-    //console.log("Firing", this.name)
-    if (this.name == "Shield"){
-      console.log("Making shield")
-      world.lines = world.lines.concat(new this.bullet(center, velocity));
-      this.last_fired = world.time;
-      return;
-    }
     if ((this.capacity == 0 || this.rounds_remaining > 0) && this.temperature < this.heat_capacity){
       new_bullet = new this.bullet(center, velocity);
       world.projectiles = world.projectiles.concat(new_bullet);
@@ -229,7 +222,6 @@ Missile.prototype = {
 
   // **update()** updates the state of the bullet for a single tick.
   update: function(world) {
-    // console.log("updating missle",this.center)
     for (var j=0; j<world.circles.length; j++){
       if (trig.distance(world.circles[j].center, this.center) <= world.circles[j].hit_area) {
         world.circles[j].health -= this.damage;
@@ -268,7 +260,6 @@ var MultiMissile = function(center, velocity) {
     var newVelocity = matrix.rotate(this.velocity, this.relativeAngles[i]);
     childMissiles.push(new this.baseBullet(newCenter, newVelocity));
   } 
-  // console.log("Returning:", childMissiles)
   return childMissiles;
 };
 
@@ -294,7 +285,6 @@ var Shield = function(center, velocity) {
     shieldLines.push(line);
     angle = angle2;
   } 
-  // console.log("Returning:", childMissiles)
   return shieldLines;
 };
 

@@ -7,6 +7,7 @@ var Game = (function(game) {
   var max_speed = 7;
   var min_speed = -3.5;
   var NUM_LIVES = 5;
+  var INITIAL_KILL_MULTIPLIER = 10;
   // var num_circles = 8;
   // var game.screen;
   // var dimensions;
@@ -55,6 +56,8 @@ var Game = (function(game) {
       level: 0,
       init: false,
       lives: NUM_LIVES,
+      score: 0,
+      kill_multiplier: INITIAL_KILL_MULTIPLIER,
 
       stillOnTheCanvas: function(body) {
         return body.center.x > 0 && body.center.x < game.screen.canvas.width &&
@@ -92,7 +95,7 @@ var Game = (function(game) {
       }
 
       if (world.circles.length == 0 && world.running){
-        printScoreText(world.time, "black", world);
+        printScoreText(world.score, "black", world);
         printMainText("You Win! :)", "blue", world);
         if (world.level == game.levels.length-1) 
         {
@@ -120,7 +123,7 @@ var Game = (function(game) {
       world.misc.push(new game.Text("Score: "+score, {x: game.dimensions.x/2, y: game.dimensions.y/4+10}, 0, font));
 
       font = {style: "10px Verdana", align: "center", color: "black" };
-      world.misc.push(new game.Text("It's golf scoring - lower is better", {x: game.dimensions.x/2,y: game.dimensions.y/4+40}, 0, font));
+      // world.misc.push(new game.Text("It's golf scoring - lower is better", {x: game.dimensions.x/2,y: game.dimensions.y/4+40}, 0, font));
     };
 
     function printMainText(text, color, world) {
@@ -142,6 +145,7 @@ var Game = (function(game) {
     if (level < 0 || level >= game.levels.length) level = 0; // make sure this level exists
     world.level = level;
     world.lives = lives || NUM_LIVES;
+    world.kill_multiplier = INITIAL_KILL_MULTIPLIER+1;
 
     // Clear arrays
     world.misc.length = 0;
@@ -184,12 +188,34 @@ var Game = (function(game) {
                                      0,
                                      {style: "15px Courier", align: "left", color: "black"} )
     world.shieldReloadBar = new game.FillBar({x: 55, y: 28}, {x: 100, y: 12}, "#58ACFA", 0.0);
+    world.scoreLabel = new game.Text("Score:",
+                                     {x: game.dimensions.x-140, y: 15},
+                                     0,
+                                     {style: "15px Courier", align: "left", color: "black"} )
+    world.scoreText = new game.Text("",
+                                     {x: game.dimensions.x-5, y: 15},
+                                     0,
+                                     {style: "15px Courier", align: "right", color: "black"} )
+    world.livesLabel = new game.Text("Lives:",
+                                     {x: game.dimensions.x-140, y: 30},
+                                     0,
+                                     {style: "15px Courier", align: "left", color: "black"} )
+    world.scoreMultiplier = new game.Text("1000",
+                                     {x: game.dimensions.x-25, y: 45},
+                                     0,
+                                     {style: "15px Courier", align: "right", color: "black"} )
+    world.scoreMultiplierBar = new game.FillBar({x: game.dimensions.x-13, y: 40}, {x: 15, y: 7}, "magenta", 0.0, false);
     world.misc.push(world.primaryWeaponText);
     world.misc.push(world.primaryReloadBar);
     world.misc.push(world.secondaryWeaponText);
     world.misc.push(world.secondaryReloadBar);
     world.misc.push(world.shieldText);
     world.misc.push(world.shieldReloadBar);
+    world.misc.push(world.scoreLabel);
+    world.misc.push(world.scoreText);
+    world.misc.push(world.livesLabel);
+    world.misc.push(world.scoreMultiplier);
+    world.misc.push(world.scoreMultiplierBar);
 
     // game logic vars
     world.time = 0;
@@ -273,6 +299,16 @@ var Game = (function(game) {
     world.secondaryWeaponText.setText("Secondary Weapon: "+world.player.secondaryWeapon.name+"\nRounds Remaining: "+(world.player.secondaryWeapon.capacity > 0 ? world.player.secondaryWeapon.rounds_remaining : "Infinite")+"\nReload Time:");
     world.secondaryReloadBar.setPercent((world.time - world.player.secondaryWeapon.last_fired)/world.player.secondaryWeapon.reload_time);
     world.shieldReloadBar.setPercent((world.time - world.player.shield.last_fired)/world.player.shield.reload_time);
+    world.scoreText.setText(world.score.toFixed(0));
+    world.scoreMultiplier.setText(world.kill_multiplier.toFixed(0));
+    if (world.kill_multiplier > 1)
+      world.scoreMultiplierBar.setPercent((300-world.time%300)/300);
+    else
+      world.scoreMultiplierBar.setPercent(1);
+
+    // Update kill multiplier
+    if ((world.time % 300 == 0) && (world.kill_multiplier > 1))
+      world.kill_multiplier--;;
 
     world.time += 1;
   };
@@ -291,8 +327,8 @@ var Game = (function(game) {
     // Draw lives
     screen.fillStyle="#2E2EFE";
     for (var i = 0; i < world.lives; i++) {
-      var size = {x: 15, y: 15};
-      var center = {x: game.dimensions.x-(i*(size.x+5))-size.x, y: size.y};
+      var size = {x: 10, y: 10};
+      var center = {x: game.dimensions.x-(i*(size.x+5))-size.x, y: 25};
       screen.fillRect(center.x - size.x / 2, center.y - size.y / 2, size.x, size.y);
     }
   };
