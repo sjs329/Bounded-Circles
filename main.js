@@ -6,6 +6,7 @@ var Game = (function(game) {
 
   var max_speed = 7;
   var min_speed = -3.5;
+  var NUM_LIVES = 5;
   // var num_circles = 8;
   // var game.screen;
   // var dimensions;
@@ -53,6 +54,7 @@ var Game = (function(game) {
       running: false,
       level: 0,
       init: false,
+      lives: NUM_LIVES,
 
       stillOnTheCanvas: function(body) {
         return body.center.x > 0 && body.center.x < game.screen.canvas.width &&
@@ -77,8 +79,15 @@ var Game = (function(game) {
 
       if (!world.player.alive && world.running) {
         printScoreText("infinity", "black", world);
-        printMainText("You Lose! :(", "red", world);
-        printSubText("(Press 'R' to restart the game)", "black", world);
+        // printMainText("You Lose! :(", "red", world);
+        if (world.lives > 1) {
+          printMainText("Ouch! :(", "red", world);
+          printSubText("(Press 'R' to restart this level)", "black", world);
+        }
+        else {
+          printMainText("You Lose! :(", "red", world);
+          printSubText("(Press 'R' to restart the game)", "black", world); 
+        }
         world.running = false;
       }
 
@@ -129,9 +138,10 @@ var Game = (function(game) {
     tick();
   };
 
-  game.reset = function(world, level) {
+  game.reset = function(world, level, lives) {
     if (level < 0 || level >= game.levels.length) level = 0; // make sure this level exists
     world.level = level;
+    world.lives = lives || NUM_LIVES;
 
     // Clear arrays
     world.misc.length = 0;
@@ -276,6 +286,14 @@ var Game = (function(game) {
     var bodies = world.lines.concat(world.player).concat(world.projectiles).concat(world.misc).concat(world.persistant).concat(world.circles);
     for (var i = 0; i < bodies.length; i++) {
       bodies[i].draw(screen);
+    }
+
+    // Draw lives
+    screen.fillStyle="#2E2EFE";
+    for (var i = 0; i < world.lives; i++) {
+      var size = {x: 15, y: 15};
+      var center = {x: game.dimensions.x-(i*(size.x+5))-size.x, y: size.y};
+      screen.fillRect(center.x - size.x / 2, center.y - size.y / 2, size.x, size.y);
     }
   };
 

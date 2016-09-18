@@ -245,7 +245,7 @@ var Game = (function (game){
           if (world.level == game.levels.length-1) //if it's the last level, start over
             game.reset(world, 0);
           else
-            game.reset(world, world.level);
+            game.reset(world, world.level, world.lives);
         }
       }
       
@@ -253,8 +253,13 @@ var Game = (function (game){
       {
         if (this.keyboarder.isDown(this.keyboarder.KEYS.R))
         {
-          // game.reset(world, 0);
-          game.reset(world, world.level);
+          world.lives--;
+          if (world.lives > 0) {
+            game.reset(world, world.level, world.lives);
+          }
+          else {
+            game.reset(world, 0);
+          }
         }
         if (world.player.alive) //we won!
         {
@@ -262,7 +267,7 @@ var Game = (function (game){
           {
             var next_level = world.level + 1;
             if (next_level < game.levels.length)
-              game.reset(world, world.level + 1);
+              game.reset(world, world.level + 1, world.lives);
             else
               console.log("No more levels!");
           }
