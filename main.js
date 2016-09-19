@@ -301,7 +301,7 @@ var Game = (function(game) {
     world.persistant = world.persistant.filter(world.stillExists);
 
     //remove weapons wih no ammo
-    world.secondaryWeaponList = world.secondaryWeaponList.filter(function (weap) {return weap.rounds_remaining>0;})
+    world.secondaryWeaponList = world.secondaryWeaponList.filter(function (weap) {return weap.capacity>0 && weap.rounds_remaining>0;})
     if (world.player.secondaryWeaponInd >= world.secondaryWeaponList.length) {
       world.player.secondaryWeaponInd = 0;
     }
@@ -310,6 +310,9 @@ var Game = (function(game) {
         world.player.secondaryWeapon = world.secondaryWeaponList[world.player.secondaryWeaponInd];
         world.player.secondaryWeapon.last_fired = world.time;
       }
+    } else {
+      world.secondaryWeaponList.push(new Fish(world));
+      world.player.secondaryWeapon = world.secondaryWeaponList[0];
     }
 
     // Special case for circles to reset their circle_checked field
