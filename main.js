@@ -48,6 +48,7 @@ var Game = (function(game) {
       primaryReloadBar: {},
       secondaryWeaponText: "",
       secondaryReloadBar: {},
+      secondaryWeaponList: [],
       shieldText: "",
       shieldReloadBar: {},
 
@@ -157,6 +158,7 @@ var Game = (function(game) {
     // Clear arrays
     world.misc.length = 0;
     world.projectiles.length = 0;    
+    world.secondaryWeaponList.length = 0;
 
     // rebuild lines and circles if they exists in this level
     if (game.levels[level].lines) 
@@ -175,6 +177,7 @@ var Game = (function(game) {
     world.player = new game.Player(world.dimensions); //game.levels[level].player;
     world.player.primaryWeapon = new game.levels[level].primaryWeapon;
     world.player.secondaryWeapon = new game.levels[level].secondaryWeapon;
+    world.secondaryWeaponList.push(world.player.secondaryWeapon);
     world.player.secretWeapon = new game.levels[level].secretWeapon;
     world.player.secretWeapon.capacity = 0;
     world.player.secretWeapon.reload_time = 2;
@@ -186,10 +189,10 @@ var Game = (function(game) {
                                      {style: "15px Courier", align: "left", color: "black"} )
     world.primaryReloadBar = new game.FillBar({x: 218, y: game.dimensions.y+40}, {x: 100, y: 12}, "gray", 0.0);
     world.secondaryWeaponText = new game.Text("",
-                                     {x: game.dimensions.x/2, y: game.dimensions.y+15},
+                                     {x: game.dimensions.x/2-100, y: game.dimensions.y+15},
                                      0,
                                      {style: "15px Courier", align: "left", color: "black"} )
-    world.secondaryReloadBar = new game.FillBar({x: game.dimensions.x/2 + 215, y: game.dimensions.y+40}, {x: 100, y: 12}, "gray", 0.0);
+    world.secondaryReloadBar = new game.FillBar({x: game.dimensions.x/2 + 115, y: game.dimensions.y+40}, {x: 100, y: 12}, "gray", 0.0);
     world.shieldText = new game.Text("Shield",
                                      {x: 5, y: 15},
                                      0,
@@ -297,6 +300,18 @@ var Game = (function(game) {
     world.misc = world.misc.filter(world.stillExists);
     world.persistant = world.persistant.filter(world.stillExists);
 
+    //remove weapons wih no ammo
+    world.secondaryWeaponList = world.secondaryWeaponList.filter(function (weap) {return weap.rounds_remaining>0;})
+    if (world.player.secondaryWeaponInd >= world.secondaryWeaponList.length) {
+      world.player.secondaryWeaponInd = 0;
+    }
+    if (world.secondaryWeaponList.length > 0) {
+      if (world.player.secondaryWeapon.name != world.secondaryWeaponList[world.player.secondaryWeaponInd].name) {
+        world.player.secondaryWeapon = world.secondaryWeaponList[world.player.secondaryWeaponInd];
+        world.player.secondaryWeapon.last_fired = world.time;
+      }
+    }
+
     // Special case for circles to reset their circle_checked field
     for (var i=0; i<world.circles.length; i++) world.circles[i].circle_checked = false;
 
@@ -313,9 +328,10 @@ var Game = (function(game) {
     else
       world.scoreMultiplierBar.setPercent(1);
 
+
     // Update kill multiplier
     if ((world.time % 300 == 0) && (world.kill_multiplier > 1))
-      world.kill_multiplier--;;
+      world.kill_multiplier--;
 
     world.time += 1;
   };
@@ -337,6 +353,34 @@ var Game = (function(game) {
       var size = {x: 10, y: 10};
       var center = {x: game.dimensions.x-(i*(size.x+5))-size.x, y: 25};
       screen.fillRect(center.x - size.x / 2, center.y - size.y / 2, size.x, size.y);
+    }
+
+    // Draw available secondary weapons
+    for (var i=0; i < world.secondaryWeaponList.length; i++) {
+      var powerup = new game.Powerup({x:0,y:0}, {x:0,y:0}, {x:0,y:0}, Fish, world);
+      powerup.center = {x: game.dimensions.x-215+(i*(2*powerup.radius+3)), y: game.dimensions.y + powerup.radius + 15};
+      // powerup.radius /= 2;
+      powerup.draw(screen, world.secondaryWeaponList[i]);
+      if (i == world.player.secondaryWeaponInd) {
+        screen.beginPath();
+        screen.strokeStyle = "black"
+        screen.arc(powerup.center.x, powerup.center.y, powerup.radius, 0, Math.PI * 2, true);
+        screen.closePath();
+        screen.stroke();
+      }
+      if (world.secondaryWeaponList[i].capacity == 0) {
+        var ammo = new game.Text('inf', 
+                               {x: game.dimensions.x-215+(i*(2*powerup.radius+3)), y: game.dimensions.y + powerup.radius + 35},
+                               0, 
+                               {style: "10px Courier", align: "center", color: "black"} )
+      }
+      else {
+        var ammo = new game.Text(''+world.secondaryWeaponList[i].rounds_remaining, 
+                               {x: game.dimensions.x-215+(i*(2*powerup.radius+3)), y: game.dimensions.y + powerup.radius + 35},
+                               0, 
+                               {style: "10px Courier", align: "center", color: "black"} )
+      }
+      ammo.draw(screen)
     }
   };
 

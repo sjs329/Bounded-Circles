@@ -84,7 +84,7 @@ var Game = (function (game){
 
       if (Math.random() < this.powerup_probablity) {
         var rand = Math.random()
-        var weapon;
+        var weapon = SMG;
         if (rand < 0.20) {
           if (world.lives < world.max_lives)
             weapon = NewLife;
@@ -158,9 +158,11 @@ var Game = (function (game){
 
     // Create a keyboard object to track button presses.
     this.keyboarder = new Keyboarder();
+    this.h_pressed = false;
 
     this.primaryWeapon = Pistol();
     this.secondaryWeapon = Fish();
+    this.secondaryWeaponInd = 0;
     this.secondaryWeaponTemp = new game.FillBar({x: this.center.x, y: this.center.y-11}, {x: 15, y: 3}, 'red', 0, false)
     this.secretWeapon = FlameThrower();
     this.secretWeapon.capacity = 0;
@@ -286,30 +288,42 @@ var Game = (function (game){
           }
         }
       }
+
+      //switching weapons
+      if (!this.h_pressed && this.keyboarder.isDown(this.keyboarder.KEYS.H)) {
+        this.secondaryWeaponInd++;
+        if (this.secondaryWeaponInd >= world.secondaryWeaponList) {
+          this.secondaryWeaponInd = 0;
+        }
+        this.h_pressed = true;
+      }
+      if (!this.keyboarder.isDown(this.keyboarder.KEYS.H)) {
+        this.h_pressed = false;
+      }
       if (this.keyboarder.isDown(this.keyboarder.KEYS.ONE) && this.keyboarder.isDown(this.keyboarder.KEYS.SHIFT))
-        {
-          game.reset(world, 0);
-        }
+      {
+        game.reset(world, 0);
+      }
       if (this.keyboarder.isDown(this.keyboarder.KEYS.TWO) && this.keyboarder.isDown(this.keyboarder.KEYS.SHIFT))
-        {
-          game.reset(world, 1);
-        }
+      {
+        game.reset(world, 1);
+      }
       if (this.keyboarder.isDown(this.keyboarder.KEYS.THREE) && this.keyboarder.isDown(this.keyboarder.KEYS.SHIFT))
-        {
-          game.reset(world, 2);
-        }
+      {
+        game.reset(world, 2);
+      }
       if (this.keyboarder.isDown(this.keyboarder.KEYS.FOUR) && this.keyboarder.isDown(this.keyboarder.KEYS.SHIFT))
-        {
-          game.reset(world, 3);
-        }
+      {
+        game.reset(world, 3);
+      }
       if (this.keyboarder.isDown(this.keyboarder.KEYS.FIVE) && this.keyboarder.isDown(this.keyboarder.KEYS.SHIFT))
-        {
-          game.reset(world, 4);
-        }
+      {
+        game.reset(world, 4);
+      }
       if (this.keyboarder.isDown(this.keyboarder.KEYS.SIX) && this.keyboarder.isDown(this.keyboarder.KEYS.SHIFT))
-        {
-          game.reset(world, 5);
-        }
+      {
+        game.reset(world, 5);
+      }
     },
 
     draw: function(screen) {
@@ -397,7 +411,6 @@ var Game = (function (game){
       }
       if (world.player.alive && trig.distance(this.center, world.player.center) <= this.radius + world.player.size.x/2) 
       {
-        var rand = Math.random();
         if (this.weaponProto.name == 'Life') {
           if (world.lives < world.max_lives) {
             world.lives++;
@@ -405,32 +418,30 @@ var Game = (function (game){
           this.exists = false;
           return;
         }
-        if (rand < 0.05)
-        {
-          world.player.secondaryWeapon = new Fish(world);
+        var matching_weapon;
+        //remove blanks
+        world.secondaryWeaponList = world.secondaryWeaponList.filter(function (weap) { return weap.name !== 'Blanks' });
+        for (var i=0; i<world.secondaryWeaponList.length; i++) {
+          if (world.secondaryWeaponList[i].name === this.weaponProto.name) {
+            matching_weapon = world.secondaryWeaponList[i];
+            break;
+          }
         }
-        else
-        {
-          var newRoundsRemaining = this.weaponProto.rounds_remaining;
-          if (world.player.secondaryWeapon.name == this.weaponProto.name) {
-            newRoundsRemaining += world.player.secondaryWeapon.rounds_remaining;
-          }
-          if (typeof world.player.secondaryWeapon.exists !== 'undefined') 
+        if (matching_weapon) {
+          matching_weapon.rounds_remaining += this.weaponProto.rounds_remaining;
+        }
+        else {
+          world.secondaryWeaponList.push(this.weaponProto)
+          if (typeof this.weaponProto.exists !== 'undefined') 
           {
-            world.player.secondaryWeapon.exits = false; //this will let the old gun get filtered from world.misc
-          }
-          world.player.secondaryWeapon = new this.weapon(world);
-          world.player.secondaryWeapon.rounds_remaining = newRoundsRemaining; // this can make the rounds remaining greater than the capacity. but that should be fine....
-          if (typeof world.player.secondaryWeapon.exists !== 'undefined') 
-          {
-            world.misc.push(world.player.secondaryWeapon);
+            world.misc.push(this.weaponProto); //make sure to add any updateable weapons to misc.
           }
         }
         this.exists = false;
       }
     },
 
-    draw: function(screen) {
+    draw_int: function(screen) {
       screen.beginPath();
       screen.arc(this.center.x, this.center.y, this.radius, 0, Math.PI*2, false);
       screen.closePath();
@@ -440,6 +451,18 @@ var Game = (function (game){
       screen.textAlign = "center";
       screen.fillStyle = "black";
       screen.fillText(this.weaponProto.symbol, this.center.x, this.center.y+this.radius/2);
+    },
+
+    draw_ext: function(screen, weaponProto) {
+      this.weaponProto = weaponProto;
+      this.draw_int(screen);
+    },
+
+    draw: function(screen, weaponProto) {
+      if (arguments.length == 1)
+        return this.draw_int(screen);
+      else
+        return this.draw_ext(screen, weaponProto);
     }
   };
 
@@ -448,7 +471,6 @@ var Game = (function (game){
     this.text = text;
     this.center = center;
     this.font = font;
-    //this.size = ""+size+"px";
     this.velocity = {x: 0, y: 0};
     this.lifespan = lifespan;
     this.type = "text"

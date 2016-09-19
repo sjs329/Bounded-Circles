@@ -84,6 +84,8 @@ OverheatableWeapon.prototype = {
     else {
       this.name = this.name_base;
     }
+    if (this.rounds_remaining == 0)
+      this.exists = false; //remove from existance if it's empty
   },
 
   draw: function(screen) {
@@ -96,7 +98,7 @@ OverheatableWeapon.prototype = {
 ///*******************///
 // Fishes shoot blanks.... duh
 function Fish(world) {
-  return new Weapon(Blank, 10, 0, "Blanks", "black", "-", world);
+  return new Weapon(Blank, 10, 0, "Blanks", "silver", "-", world);
 };
 
 function Pistol(world) {
@@ -108,7 +110,7 @@ function SMG(world) {
 };
 
 function GatlingGun(world) {
-  return new OverheatableWeapon(Bullet, 2 , 300, 400, 0.75, "Gatling Gun", "yellow", "G", world);
+  return new OverheatableWeapon(FastBullet, 2 , 300, 400, 0.75, "Gatling Gun", "yellow", "G", world);
 };
 
 function MissileLauncher(world) {
@@ -116,7 +118,7 @@ function MissileLauncher(world) {
 };
 
 function MultiMissileLauncher(world) {
-  return new Weapon(MultiMissile, 40, 5, "Multi-Missile Launcher", "orange", "Q", world);
+  return new Weapon(MultiMissile, 40, 5, "Multi-Missile", "orange", "Q", world);
 };
 
 function FlameThrower(world) {
@@ -184,6 +186,42 @@ var Bullet = function(center, velocity) {
 };
 
 Bullet.prototype = {
+
+  // **update()** updates the state of the bullet for a single tick.
+  update: function(world) {
+    for (var j=0; j<world.circles.length; j++){
+      if (trig.distance(world.circles[j].center, this.center) <= world.circles[j].hit_area) {
+        world.circles[j].health -= this.damage;
+        this.exists = false;
+        break;
+      }
+    }
+  },
+
+  draw: function(screen) {
+    screen.beginPath();
+    screen.fillStyle="#FF0000";
+    screen.fillRect(this.center.x - this.size.x / 2, this.center.y - this.size.y / 2,
+                  this.size.x, this.size.y);
+  }
+};
+
+// **new Bullet()** creates a new bullet.
+var FastBullet = function(center, velocity) {
+  this.center = center;
+  this.size = { x: 3, y: 3 };
+  this.speed = 15;
+  this.velocity = matrix.multiply(matrix.unitVector(velocity), this.speed);
+  this.type = "bullet"
+  this.gravity = 0.0;
+  this.air_resist = 0.0;
+  this.damage = 15;
+  this.exists = true; //this gets set to false when this bullet hits something
+  this.floor = 10000;
+  this.heating = 10; //overheatable weapon heats this much per round
+};
+
+FastBullet.prototype = {
 
   // **update()** updates the state of the bullet for a single tick.
   update: function(world) {
