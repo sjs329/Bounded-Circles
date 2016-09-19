@@ -10,7 +10,6 @@ var Game = (function (game){
     this.health = 100;
     this.exists = true;
     this.circle_checked = false;
-    this.powerup_probablity = 0.60;
     this.hit_area = 10;
     this.mass = 1;
     this.gravity = 0.06;
@@ -82,29 +81,35 @@ var Game = (function (game){
         world.persistant.push(new game.Debris(this.gameSize, position, velocity, lifespan, color));
       }
 
-      if (Math.random() < this.powerup_probablity) {
-        var rand = Math.random()
-        var weapon = SMG;
-        if (rand < 0.20) {
-          if (world.lives < world.max_lives)
-            weapon = NewLife;
-          else
-            weapon = SMG
-        }
-        else if (rand < 0.4) {
-          weapon = FlameThrower;
-        }
-        else if (rand < 0.6) {
-          weapon = MissileLauncher;
-        }
-        else if (rand < 0.8) {
-          weapon = GatlingGun;
-        }
-        else {
-          weapon = MultiMissileLauncher;
-        }
+      var rand = Math.random();
+      if (rand < game.levels[world.level].powerup_drop_prob) {
+
+        var weapon = this.getRandElement(game.levels[world.level].powerups, game.levels[world.level].powerup_probs)
         world.misc.push(new game.Powerup(this.gameSize, {x: this.center.x, y: this.center.y}, {x: 0, y: 0.1}, weapon, world));
       }
+    },
+
+    getRandElement: function(array, probabilities) {
+      var i = 0;
+      var sum = 0;
+      var boundary = 0;
+      var temp_ar = [];
+      for (i=0; i<probabilities.length; i++) {
+        // console.log("Adding",probabilities[i],"to sum",sum);
+        sum+=probabilities[i];
+      }
+      for (i=0; i<probabilities.length-1; i++)
+      {
+        boundary += (probabilities[i] / sum);
+        temp_ar.push(boundary);
+      }
+      // console.log("Sum:",sum)
+      // console.log("Bounds:", temp_ar);
+      var r = Math.random(); // returns [0,1]
+      // console.log("Rand:", r);
+      for (i=0; i<temp_ar.length && r>=temp_ar[i]; i++); //loop through until we find the right boundary
+      // console.log("i:", i)
+      return array[i];
     }
   };
 

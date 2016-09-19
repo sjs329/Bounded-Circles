@@ -13,8 +13,11 @@ var Game = (function(game) {
     this.circles = args.circles;
     this.num_rand_circles = args.num_rand_circles;
     this.primaryWeapon = args.primaryWeapon;
-    this.secondaryWeapon = args.secondaryWeapon;
+    this.secondaryWeapon = args.secondaryWeapon; //secondary weapon you start with
     this.secretWeapon = args.secretWeapon;
+    this.powerup_drop_prob = args.powerup_drop_prob; //the probability that killing a circle will drop a powerup
+    this.powerups = args.powerups; //array of possible powerups that can be dropped.
+    this.powerup_probs = args.powerup_probs; //array of probiabilities (same size as powerups) dictating relative probability of drops
   };
 
 
@@ -50,7 +53,11 @@ var Game = (function(game) {
 
         primaryWeapon: Pistol,
         secondaryWeapon: Fish,
-        secretWeapon: FlameThrower
+        secretWeapon: FlameThrower,
+
+        powerup_drop_prob: 0,
+        powerups: [],
+        powerup_probs: []
       }),
       //-------- END LEVEL 0 ---------//
 
@@ -96,7 +103,11 @@ var Game = (function(game) {
 
         primaryWeapon: Pistol,
         secondaryWeapon: SMG,
-        secretWeapon: MultiMissileLauncher
+        secretWeapon: MultiMissileLauncher,
+
+        powerup_drop_prob: 0.5,
+        powerups: [SMG, MissileLauncher, FlameThrower],
+        powerup_probs: [50, 25, 25]
       }),
       //-------- END LEVEL 1 ---------//
 
@@ -138,7 +149,11 @@ var Game = (function(game) {
         
         primaryWeapon: Pistol,
         secondaryWeapon: SMG,
-        secretWeapon: MultiMissileLauncher
+        secretWeapon: MultiMissileLauncher,
+
+        powerup_drop_prob: 0.6,
+        powerups: [SMG, FlameThrower, GatlingGun],
+        powerup_probs: [33, 33, 33]
       }),
       //-------- END LEVEL 2 ---------//
 
@@ -174,7 +189,11 @@ var Game = (function(game) {
         
         primaryWeapon: FlameThrower,
         secondaryWeapon: Fish,
-        secretWeapon: MultiMissileLauncher
+        secretWeapon: MultiMissileLauncher,
+
+        powerup_drop_prob: 0.7,
+        powerups: [SMG, MissileLauncher, FlameThrower, MultiMissileLauncher, GatlingGun],
+        powerup_probs: [2, 2, 2, 2, 92]
       }),
       //-------- END LEVEL 3 ---------//
 
@@ -204,7 +223,11 @@ var Game = (function(game) {
         
         primaryWeapon: MultiMissileLauncher,
         secondaryWeapon: MultiMissileLauncher,
-        secretWeapon: MultiMissileLauncher
+        secretWeapon: MultiMissileLauncher,
+
+        powerup_drop_prob: 0.85,
+        powerups: [SMG, MissileLauncher, FlameThrower, MultiMissileLauncher, GatlingGun, NewLife],
+        powerup_probs: [17, 17, 17, 17, 17, 15]
       }),
       //-------- END LEVEL 4 ---------//
 
@@ -234,7 +257,11 @@ var Game = (function(game) {
 
         primaryWeapon: MultiMissileLauncher,
         secondaryWeapon: MultiMissileLauncher,
-        secretWeapon: MultiMissileLauncher
+        secretWeapon: MultiMissileLauncher,
+
+        powerup_drop_prob: 1.0,
+        powerups: [MultiMissileLauncher, NewLife],
+        powerup_probs: [80, 20]
       }),
       //-------- END LEVEL 4 ---------//
     ];
