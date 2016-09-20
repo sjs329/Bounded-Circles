@@ -224,17 +224,6 @@ var Game = (function (game){
             this.shield.fire({ x: this.center.x, y: this.center.y }, { x: 0, y: 0 }, world);
           }
         }
-
-        if (this.keyboarder.isDown(this.keyboarder.KEYS.R))
-        {
-          // if (world.level == game.levels.length-1) { //if it's the last level, start over
-          //   world.score = 0;
-          //   game.reset(world, 0);
-          // }
-          // else {
-            game.reset(world, world.level, world.lives);
-          // }
-        }
       }
       
       if (!world.running) //this level is over
@@ -242,7 +231,7 @@ var Game = (function (game){
         if (this.keyboarder.isDown(this.keyboarder.KEYS.R))
         {
           world.lives--;
-          if (world.lives > 0) {
+          if (world.lives > 0 && world.level < game.levels.length-1) {
             game.reset(world, world.level, world.lives);
           }
           else {
@@ -262,6 +251,12 @@ var Game = (function (game){
             else
               console.log("No more levels!");
           }
+        }
+      }
+      else {
+        if (this.keyboarder.isDown(this.keyboarder.KEYS.R))
+        {
+          game.reset(world, world.level, world.lives); //allow resets during level
         }
       }
 
