@@ -314,12 +314,12 @@ var Game = (function(game) {
         circles: [
           {
             gameSize: game.dimensions,
-            center: { x: game.dimensions.x/2+20, y: game.dimensions.y/8 },
+            center: { x: game.dimensions.x/2+20, y: game.dimensions.y/10 },
             velocity: { x: 2, y: 0 }
           },
           {
             gameSize: game.dimensions,
-            center: { x: game.dimensions.x/2-20, y: game.dimensions.y/8 },
+            center: { x: game.dimensions.x/2-20, y: game.dimensions.y/10 },
             velocity: { x: -2, y: 0 }
           },
           {

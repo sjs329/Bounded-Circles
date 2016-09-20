@@ -227,13 +227,13 @@ var Game = (function (game){
 
         if (this.keyboarder.isDown(this.keyboarder.KEYS.R))
         {
-          if (world.level == game.levels.length-1) { //if it's the last level, start over
-            world.score = 0;
-            game.reset(world, 0);
-          }
-          else {
+          // if (world.level == game.levels.length-1) { //if it's the last level, start over
+          //   world.score = 0;
+          //   game.reset(world, 0);
+          // }
+          // else {
             game.reset(world, world.level, world.lives);
-          }
+          // }
         }
       }
       
