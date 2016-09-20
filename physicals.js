@@ -228,17 +228,6 @@ var Game = (function (game){
       
       if (!world.running) //this level is over
       {
-        if (this.keyboarder.isDown(this.keyboarder.KEYS.R))
-        {
-          world.lives--;
-          if (world.lives > 0 && world.level < game.levels.length-1) {
-            game.reset(world, world.level, world.lives);
-          }
-          else {
-            world.score = 0;
-            game.reset(world, 0);
-          }
-        }
         if (world.player.alive) //we won!
         {
           if (this.keyboarder.isDown(this.keyboarder.KEYS.N))
@@ -250,6 +239,27 @@ var Game = (function (game){
             }
             else
               console.log("No more levels!");
+          }
+          if (this.keyboarder.isDown(this.keyboarder.KEYS.R))
+          {
+            if (world.level < game.levels.length-1) {
+              game.reset(world, world.level, world.lives); //restart level
+            } else {
+              world.score = 0;
+              game.reset(world, 0); //restart game
+            }
+          }
+        }
+        else { //we're dead :(
+          if (this.keyboarder.isDown(this.keyboarder.KEYS.R)) {
+            world.lives--;
+            if (world.lives > 0 && world.circles.length > 0) {
+              game.reset(world, world.level, world.lives);
+            }
+            else {
+              world.score = 0;
+              game.reset(world, 0);
+            }
           }
         }
       }
