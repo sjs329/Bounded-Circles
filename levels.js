@@ -232,7 +232,7 @@ var Game = (function(game) {
       //-------- END LEVEL 4 ---------//
 
       //-----------------//
-      //---- LEVEL X ----//
+      //---- LEVEL 5 ----//
       //-----------------//
       new Level(
       {
@@ -259,11 +259,101 @@ var Game = (function(game) {
         secondaryWeapon: MultiMissileLauncher,
         secretWeapon: MultiMissileLauncher,
 
-        powerup_drop_prob: 1.0,
+        powerup_drop_prob: 0.95,
         powerups: [MultiMissileLauncher, NewLife],
         powerup_probs: [80, 20]
       }),
-      //-------- END LEVEL 4 ---------//
+      //-------- END LEVEL 5 ---------//
+
+      //-----------------//
+      //---- LEVEL 6 ----//
+      //-----------------//
+      new Level(
+      {
+        // Set up the border lines.
+        lines: [
+          //outer border
+          { pt1: { x: 0, y: 0 }, pt2: { x: 0, y: game.screen.canvas.height } },
+          { pt1: { x: 0, y: game.screen.canvas.height }, pt2: { x: game.screen.canvas.width, y: game.screen.canvas.height } },
+          { pt1: { x: game.screen.canvas.width, y: game.screen.canvas.height }, pt2: { x: game.screen.canvas.width, y: 0 } },
+          { pt1: { x: game.screen.canvas.width, y: 0 }, pt2: { x: 0, y: 0 } },
+
+          //line above weapon info text
+          { pt1: { x: 0, y: game.dimensions.y}, pt2: {x:game.dimensions.x, y:game.dimensions.y} },
+
+          // Left Box:
+          { pt1: { x: game.dimensions.x/5-30, y: game.dimensions.y/8-30}, pt2: {x: game.dimensions.x/5+30, y: game.dimensions.y/8-30} },
+          { pt1: { x: game.dimensions.x/5+30, y: game.dimensions.y/8-30}, pt2: {x: game.dimensions.x/5+30, y: game.dimensions.y/8+30} },
+          { pt1: { x: game.dimensions.x/5+30, y: game.dimensions.y/8+30}, pt2: {x: game.dimensions.x/5-30, y: game.dimensions.y/8+30} },
+          { pt1: { x: game.dimensions.x/5-30, y: game.dimensions.y/8+30}, pt2: {x: game.dimensions.x/5-30, y: game.dimensions.y/8-30} },
+
+          // Right Box:
+          { pt1: { x: game.dimensions.x*4/5-30, y: game.dimensions.y/8-30}, pt2: {x: game.dimensions.x*4/5+30, y: game.dimensions.y/8-30} },
+          { pt1: { x: game.dimensions.x*4/5+30, y: game.dimensions.y/8-30}, pt2: {x: game.dimensions.x*4/5+30, y: game.dimensions.y/8+30} },
+          { pt1: { x: game.dimensions.x*4/5+30, y: game.dimensions.y/8+30}, pt2: {x: game.dimensions.x*4/5-30, y: game.dimensions.y/8+30} },
+          { pt1: { x: game.dimensions.x*4/5-30, y: game.dimensions.y/8+30}, pt2: {x: game.dimensions.x*4/5-30, y: game.dimensions.y/8-30} },
+
+          //bottom lines
+          { pt1: { x: game.dimensions.x/2-15, y: game.dimensions.y-63}, pt2: {x: game.dimensions.x/2+15, y: game.dimensions.y-63} },
+          // { pt1: { x: game.dimensions.x/2+45, y: game.dimensions.y-63}, pt2: {x: game.dimensions.x/2+15, y: game.dimensions.y-63} },
+
+          // next level
+          { pt1: { x: game.dimensions.x/2-60, y: game.dimensions.y-126}, pt2: {x: game.dimensions.x/2-90, y: game.dimensions.y-126} },
+
+          { pt1: { x: game.dimensions.x/2-180, y: game.dimensions.y-75}, pt2: {x: game.dimensions.x/2-210, y: game.dimensions.y-75} },
+          { pt1: { x: game.dimensions.x/2-300, y: game.dimensions.y-75}, pt2: {x: game.dimensions.x/2-330, y: game.dimensions.y-75} },
+          { pt1: { x: 5, y: game.dimensions.y-135}, pt2: {x: 35, y: game.dimensions.y-135} },
+          { pt1: { x: 5, y: game.dimensions.y-198}, pt2: {x: 35, y: game.dimensions.y-198} },
+          { pt1: { x: 5, y: game.dimensions.y-261}, pt2: {x: 35, y: game.dimensions.y-261} },
+          { pt1: { x: 5, y: game.dimensions.y-324}, pt2: {x: 35, y: game.dimensions.y-324} },
+          { pt1: { x: 5, y: game.dimensions.y-387}, pt2: {x: 35, y: game.dimensions.y-387} },
+          { pt1: { x: game.dimensions.x/2-300, y: game.dimensions.y-387}, pt2: {x: game.dimensions.x/2-330, y: game.dimensions.y-387} },
+          { pt1: { x: game.dimensions.x/2-180, y: game.dimensions.y-387}, pt2: {x: game.dimensions.x/2+180, y: game.dimensions.y-387} },
+        ],
+
+        circles: [
+          {
+            gameSize: game.dimensions,
+            center: { x: game.dimensions.x/2+20, y: game.dimensions.y/8 },
+            velocity: { x: 2, y: 0 }
+          },
+          {
+            gameSize: game.dimensions,
+            center: { x: game.dimensions.x/2-20, y: game.dimensions.y/8 },
+            velocity: { x: -2, y: 0 }
+          },
+          {
+            gameSize: game.dimensions,
+            center: { x: game.dimensions.x/2, y: game.dimensions.y/5 },
+            velocity: { x: 0, y: 2 }
+          },
+
+          //right boxed-in circle
+          {
+            gameSize: game.dimensions,
+            center: { x: game.dimensions.x/5, y: game.dimensions.y/8 },
+            velocity: { x: 1, y: 1 }
+          },
+
+          //left boxed-in circle
+          {
+            gameSize: game.dimensions,
+            center: { x: game.dimensions.x*4/5, y: game.dimensions.y/8 },
+            velocity: { x: -1, y: 1 }
+          },
+        ],
+
+        num_rand_circles: 2,
+
+        primaryWeapon: FlameThrower,
+        secondaryWeapon: FlameThrower,
+        secretWeapon: MultiMissileLauncher,
+
+        powerup_drop_prob: 0.5,
+        powerups: [FlameThrower, NewLife],
+        powerup_probs: [99, 1]
+      }),
+      //-------- END LEVEL 5 ---------//
     ];
   }
   return game;

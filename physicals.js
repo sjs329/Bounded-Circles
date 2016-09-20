@@ -113,40 +113,6 @@ var Game = (function (game){
     }
   };
 
-  // // **makeLine()** creates a line
-  // game.Line = function( args ) { // pt1, pt2) {
-  //   // console.log(args)
-  //   this.end1 = args.pt1;
-  //   this.end2 = args.pt2;
-  //   this.color = "black";
-  //   this.lifespan = 0;
-  //   this.age = 0;
-  //   this.exists = true;
-  //   this.len = trig.distance(this.end1, this.end2);
-  // };
-
-  // game.Line.prototype = {
-  //   update: function(world) {
-  //     this.age += 1;
-  //     if (this.lifespan > 0 && this.age > this.lifespan)
-  //       this.exists = false;
-  //   },
-  //   // The line has its own built-in `draw()` function.  This allows
-  //   // the main `draw()` to just polymorphicly call `draw()` on circles and lines.
-  //   draw: function(screen) {
-
-  //     screen.beginPath();
-  //     screen.lineWidth = 1.5;
-  //     screen.moveTo(this.end1.x, this.end1.y);
-  //     screen.lineTo(this.end2.x, this.end2.y);
-  //     screen.closePath();
-
-  //     screen.strokeStyle = this.color;
-  //     screen.stroke();
-  //   }
-  // };
-
-  // ------
 
   // **new Player()** creates a player.
   game.Player = function(gameSize) {
@@ -192,6 +158,11 @@ var Game = (function (game){
 
         // if we're falling, check to see if we fall through a line
         physics.updateFloor(world, this);
+
+        // make sure we don't jump through the roof
+        if (this.center.y-(this.size.y/2) <= 0) {
+          this.center.y = (this.size.y/2);
+        }
 
         // Key presses
         // If left cursor key is down...
@@ -329,6 +300,18 @@ var Game = (function (game){
       {
         game.reset(world, 5);
       }
+      if (this.keyboarder.isDown(this.keyboarder.KEYS.SEVEN) && this.keyboarder.isDown(this.keyboarder.KEYS.SHIFT))
+      {
+        game.reset(world, 6);
+      }
+      if (this.keyboarder.isDown(this.keyboarder.KEYS.EIGHT) && this.keyboarder.isDown(this.keyboarder.KEYS.SHIFT))
+      {
+        game.reset(world, 7);
+      }
+      if (this.keyboarder.isDown(this.keyboarder.KEYS.NINE) && this.keyboarder.isDown(this.keyboarder.KEYS.SHIFT))
+      {
+        game.reset(world, 8);
+      }
     },
 
     draw: function(screen) {
@@ -427,7 +410,7 @@ var Game = (function (game){
         //remove blanks
         world.secondaryWeaponList = world.secondaryWeaponList.filter(function (weap) { return weap.name !== 'Blanks' });
         for (var i=0; i<world.secondaryWeaponList.length; i++) {
-          if (world.secondaryWeaponList[i].name === this.weaponProto.name) {
+          if (world.secondaryWeaponList[i].name.substr(0,this.weaponProto.name.length) === this.weaponProto.name) {
             matching_weapon = world.secondaryWeaponList[i];
             break;
           }
