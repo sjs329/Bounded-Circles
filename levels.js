@@ -20,6 +20,110 @@ var Game = (function(game) {
     this.powerup_probs = args.powerup_probs; //array of probiabilities (same size as powerups) dictating relative probability of drops
   };
 
+  game.loadLevels = function(evt)
+  {
+    var files = evt.target.files; // FileList object
+
+    // files is a FileList of File objects. List some properties.
+    var levels = [];
+    var current_file = 0;
+    for (var file_ind = 0, f; f = files[file_ind]; file_ind++) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        new_level = new Level({ lines:[], 
+                              circles:[], 
+                              num_rand_circles:0, 
+                              primaryWeapon:Pistol, 
+                              secondaryWeapon:Fish, 
+                              secretWeapon:MultiMissileLauncher,
+                              powerup_drop_prob:1.0,
+                              powerups:[SMG],
+                              powerup_probs:[1.0]
+                                          });
+
+        //add border lines
+        new_level.lines.push({ pt1: { x: 0, y: 0 }, pt2: { x: 0, y: game.screen.canvas.height } })
+        new_level.lines.push({ pt1: { x: 0, y: game.screen.canvas.height }, pt2: { x: game.screen.canvas.width, y: game.screen.canvas.height } })
+        new_level.lines.push({ pt1: { x: game.screen.canvas.width, y: game.screen.canvas.height }, pt2: { x: game.screen.canvas.width, y: 0 } })
+        new_level.lines.push({ pt1: { x: game.screen.canvas.width, y: 0 }, pt2: { x: 0, y: 0 } })
+
+        //line above weapon info text
+        new_level.lines.push({ pt1: { x: 0, y: game.dimensions.y}, pt2: {x:game.dimensions.x, y:game.dimensions.y} })
+        var file_lines = e.target.result.split('\n');
+        for (var i=0; i<file_lines.length; i++ ) {
+          var splits = file_lines[i].split(' ');
+          if (splits.length <2 ) continue;
+          if (splits[0] == "lines") {
+            var points = file_lines[i].split('[')[1].split(']')[0].split(',')
+            // console.log("Lines:", points)
+            for (var j=0; j<points.length; j++) {
+              var nums = points[j].split(' ');
+              var point1 = {x:parseFloat(nums[0]), y:parseFloat(nums[1])}
+              var point2 = {x:parseFloat(nums[2]), y:parseFloat(nums[3])}
+              new_level.lines.push({pt1:point1, pt2:point2})
+            }
+            // console.log("Level lines:",new_level.lines)
+          }
+          else if (splits[0] == "circles") {
+            var circles = file_lines[i].split('[')[1].split(']')[0].split(',')
+            for (var j=0; j<circles.length; j++) {
+              var values = circles[j].split(' ')
+              var center = {x:parseFloat(values[0]),y:parseFloat(values[1])}
+              var vel = {x:parseFloat(values[2]),y:parseFloat(values[3])}
+              // console.log("Game dims:",game.dimensions,"(",j,")")
+              var args = {gameSize:game.dimensions, center:center, velocity:vel}
+              var circle = new game.Circle(args)
+              new_level.circles.push(circle)
+            }
+          }
+          else if (splits[0] == "num_rand_circles") {
+            new_level.num_rand_circles = parseInt(splits[1]);
+          }
+          else if (splits[0] == "primaryWeapon") {
+            new_level.primaryWeapon = window[splits[1]]
+          }
+          else if (splits[0] == "secondaryWeapon") {
+            new_level.secondaryWeapon = window[splits[1]]
+          }
+          else if (splits[0] == "secretWeapon") {
+            new_level.secretWeapon = window[splits[1]]
+          }
+          else if (splits[0] == "powerup_drop_prob") {
+            new_level.powerup_drop_prob = parseFloat(splits[1])
+          }
+          else if (splits[0] == "powerups") {
+            var powerups = file_lines[i].split('[')[1].split(']')[0].split(' ')
+            for (var j=0; j<powerups.length; j++) {
+              new_level.powerups.push(window[powerups[j]])  
+            }
+          }
+          else if (splits[0] == "powerup_probs") {
+            var powerup_probs = file_lines[i].split('[')[1].split(']')[0].split(' ')
+            for (var j=0; j<powerup_probs.length; j++) {
+              new_level.powerup_probs.push(parseFloat(powerup_probs[j]))  
+            }
+          }
+          else {
+            // console.log("Ignoring line:",file_lines[i])
+          }
+        }
+        levels.push(new_level);
+      };
+      reader.onerror = function(e) {
+        console.log("Error:",e)
+      };
+
+      reader.onloadend = function(e) {
+        current_file++;
+        if (current_file == files.length) {
+          game.levels = levels
+          game.start(false)
+        }
+      }
+      reader.readAsText(f)
+    }
+  }
+
 
   
   game.buildLevels = function() 

@@ -1,0 +1,12 @@
+// lines that don't start with one of the keywords below are ignored
+lines [0 0 300 300,300 300 350 400] //stuff at the end of lines is ignored. the "//" isn't actually necessary
+num_rand_circles 0
+circles [15 10 2 0,30 20 -2 0] //this defines two circles, with the first pair being center and the second pair velocity
+primaryWeapon FlameThrower
+secondaryWeapon FlameThrower
+// there can be empty lines and stuff, but the spacing and syntax within the real lines is very important
+
+secretWeapon MultiMissileLauncher
+powerup_drop_prob 0.5
+powerups [FlameThrower SMG]
+powerup_probs [50 50]

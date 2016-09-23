@@ -13,14 +13,18 @@ var Game = (function(game) {
   // var dimensions;
 
   // **start()** creates the lines and circles and starts the simulation.
-  game.start = function() {
+  game.start = function(loadDefaults) {
 
     // In index.html, there is a canvas tag that the game will be drawn in.
     // Grab that canvas out of the DOM.  From it, get the drawing
     // context, an object that contains functions that allow drawing to the canvas.
     game.screen = document.getElementById('bounded_circles').getContext('2d');
     game.dimensions = { x: game.screen.canvas.width, y: game.screen.canvas.height - 50 };
-    game.levels = game.buildLevels();
+    if (loadDefaults) {
+      game.levels = game.buildLevels();
+    }
+    // document.getElementById('files').addEventListener('change', game.loadLevels, false);
+
 
     // `world` holds the current state of the world.
     var world = {
@@ -64,11 +68,13 @@ var Game = (function(game) {
       high_score: 0,
 
       stillOnTheCanvas: function(body) {
+        if (typeof body.center === 'undefined') return false;
         return body.center.x > 0 && body.center.x < game.screen.canvas.width &&
                body.center.y > 0 && body.center.y < game.screen.canvas.height;
       },
 
       stillExists: function(body) {
+        if (typeof body.exists === 'undefined') return false;
         return body.exists;
       }
     };
@@ -124,22 +130,22 @@ var Game = (function(game) {
     };
 
     function printScoreText(score, color, world) {
-      font = { style: "50px Verdana", align: "center", color: "black" };
+      var font = { style: "50px Verdana", align: "center", color: "black" };
       // console.log(world);
       world.misc.push(new game.Text("Score: "+score, {x: game.dimensions.x/2, y: game.dimensions.y/4+10}, 0, font));
       if (score > world.high_score) world.high_score = score;
 
-      font = {style: "20px Verdana", align: "center", color: "black" };
+      var font = {style: "20px Verdana", align: "center", color: "black" };
       world.misc.push(new game.Text("High Score: "+world.high_score, {x: game.dimensions.x/2,y: game.dimensions.y/4+40}, 0, font));
     };
 
     function printMainText(text, color, world) {
-      font = { style: "30px Verdana", align: "center", color: color };
+      var font = { style: "30px Verdana", align: "center", color: color };
       world.misc.push(new game.Text(text, {x: game.dimensions.x/2,y: game.dimensions.y/2}, 0, font));
     }
 
     function printSubText(text, color, world) {
-      font = { style: "20px Verdana", align: "center", color: color };
+      var font = { style: "20px Verdana", align: "center", color: color };
       world.misc.push(new game.Text(text, {x: game.dimensions.x/2,y: game.dimensions.y/2+30}, 0, font));
     }
 
@@ -165,12 +171,15 @@ var Game = (function(game) {
     {
       world.lines.length = 0;
       game.buildLines(world, game.levels[level].lines);
+      // console.log("Built lines:", game.levels[level].lines)
     }
     // console.log(game.levels[level])
     if (game.levels[level].circles || game.levels[level].num_rand_circles > 0) 
     {
+      // console.log("Building circles")
       world.circles.length = 0;
       game.buildCircles(world, game.levels[level].circles, game.levels[level].num_rand_circles);
+      // console.log("Circles:",game.levels[level].circles)
     }
 
     // rebuild player
@@ -251,6 +260,7 @@ var Game = (function(game) {
       }
     }
     if (num_rand > 0) {
+      // console.log("Building",num_rand,"Circles")
       for (var i=0; i<num_rand; i++) {
         world.circles.push(new game.Circle({gameSize: world.dimensions, center: {x: Math.floor(Math.random()*game.screen.canvas.width)+1, y: Math.floor(Math.random()*100)+40}, velocity: {x: Math.floor(Math.random()*max_speed) + min_speed, y: Math.floor(Math.random()*max_speed) + min_speed} } ))
         // make sure this circle isn't overlapping another one
@@ -396,7 +406,12 @@ var Game = (function(game) {
   };
 
   // When the DOM is ready, start the simulation.
-  window.addEventListener('load', game.start);
+  // window.addEventListener('load', game.start);
+  var waitForChange = function () {
+    document.getElementById('files').addEventListener('change', game.loadLevels, false);
+    game.start(true)
+  }
+  window.addEventListener('load', waitForChange);
 
   return game;
 })(Game || {});
