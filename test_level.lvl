@@ -8,5 +8,5 @@ secondaryWeapon FlameThrower
 
 secretWeapon MultiMissileLauncher
 powerup_drop_prob 0.5
-powerups [FlameThrower SMG]
+powerups [Pistol SMG]
 powerup_probs [50 50]
