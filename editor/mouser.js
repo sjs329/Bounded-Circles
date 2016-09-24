@@ -6,17 +6,22 @@ var Mouser = function(editor) {
     circles = [];
     lines = [];
     drawingLine = false;
+    drawingCircle = false;
 
     function getCoords(evt) {
         var rect = editor.canvas.getBoundingClientRect();
         if (drawingLine) {
             drawingLine = false;
         }
+        else if (drawingCircle) {
+            drawingCircle = false;
+        }
         else if (evt.shiftKey) {
             // shift=left click: draw line
             var line =  {    
                             pt1: {x: evt.clientX - rect.left, y: evt.clientY - rect.top}, 
-                            pt2: {x: evt.clientX - rect.left+1, y: evt.clientY - rect.top+1}
+                            pt2: {x: evt.clientX - rect.left, y: evt.clientY - rect.top},
+                            color: "black"
                         }
             lines.push(line)
             drawingLine = true;
@@ -27,19 +32,38 @@ var Mouser = function(editor) {
                                 {   x: evt.clientX - rect.left,
                                     y: evt.clientY - rect.top
                                 },
-                            radius: 10
+                            radius: 10,
+                            velocity: {x:0, y:0 }
                          }
             circles.push(circle)
+            drawingCircle = true;
         }
         
     };
     window.addEventListener('click', getCoords);
 
+    function onCanvas(point) {
+        return (point.x > 0 && point.x < editor.dimensions.x && point.y >0 && point.y < editor.dimensions.y);
+    }
+
     function getPosition(evt) {
         if (drawingLine) {
             var rect = editor.canvas.getBoundingClientRect();
-            lines[lines.length-1].pt2.x = evt.clientX-rect.left;
-            lines[lines.length-1].pt2.y = evt.clientY-rect.top;
+            var x = evt.clientX-rect.left;
+            var y = evt.clientY-rect.top;
+            if (onCanvas({x: x, y: y})) {
+                lines[lines.length-1].pt2.x = x;
+                lines[lines.length-1].pt2.y = y;
+            }
+        } 
+        else if (drawingCircle) {
+            var rect = editor.canvas.getBoundingClientRect();
+            var x = evt.clientX-rect.left;
+            var y = evt.clientY-rect.top;
+            if (onCanvas({x: x, y: y})) {
+                circles[circles.length-1].velocity.x = (x - circles[circles.length-1].center.x) / 10;
+                circles[circles.length-1].velocity.y = (y - circles[circles.length-1].center.y) / 10;
+            }
         }
     };
     window.addEventListener('mousemove', getPosition);
@@ -48,7 +72,7 @@ var Mouser = function(editor) {
         // Write circles.
         var file = "circles ["
         for (var i = 0; i < circles.length; i++) {
-            file += circles[i].center.x + " " + circles[i].center.y + " 0 0";
+            file += circles[i].center.x + " " + circles[i].center.y + " " + circles[i].velocity.x + " " +circles[i].velocity.y;
             if (i < circles.length - 1) {
                 file += ","
             }

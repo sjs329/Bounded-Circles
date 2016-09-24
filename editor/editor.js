@@ -35,7 +35,7 @@ var Editor = (function(editor) {
     editor.screen.moveTo(line.pt1.x, line.pt1.y);
     editor.screen.lineTo(line.pt2.x, line.pt2.y);
     editor.screen.closePath();
-    editor.screen.strokeStyle = "black";
+    editor.screen.strokeStyle = line.color;
     editor.screen.stroke();
   };
 
@@ -51,6 +51,10 @@ var Editor = (function(editor) {
     editor.screen.closePath();
     editor.screen.fillStyle = "green";
     editor.screen.fill();
+
+    //draw velocity arrow
+    var line = {pt1:circle.center, pt2: {x:circle.center.x+circle.velocity.x*10, y:circle.center.y+circle.velocity.y*10}, color: "red"}
+    editor.drawLine(line)
   };
 
   window.addEventListener('load', editor.start);
