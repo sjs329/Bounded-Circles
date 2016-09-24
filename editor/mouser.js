@@ -10,6 +10,9 @@ var Mouser = function(editor) {
 
     function getCoords(evt) {
         var rect = editor.canvas.getBoundingClientRect();
+        var x = evt.clientX-rect.left;
+        var y = evt.clientY-rect.top;
+        if (!onCanvas({x:x, y:y})) return;
         if (drawingLine) {
             drawingLine = false;
         }
@@ -19,8 +22,8 @@ var Mouser = function(editor) {
         else if (evt.shiftKey) {
             // shift=left click: draw line
             var line =  {    
-                            pt1: {x: evt.clientX - rect.left, y: evt.clientY - rect.top}, 
-                            pt2: {x: evt.clientX - rect.left, y: evt.clientY - rect.top},
+                            pt1: {x: x, y: y}, 
+                            pt2: {x: x, y: y},
                             color: "black"
                         }
             lines.push(line)
@@ -29,8 +32,8 @@ var Mouser = function(editor) {
         else {
             // left click: circle
             var circle = {  center: 
-                                {   x: evt.clientX - rect.left,
-                                    y: evt.clientY - rect.top
+                                {   x: x,
+                                    y: y
                                 },
                             radius: 10,
                             velocity: {x:0, y:0 }
@@ -47,23 +50,17 @@ var Mouser = function(editor) {
     }
 
     function getPosition(evt) {
+        var rect = editor.canvas.getBoundingClientRect();
+        var x = evt.clientX-rect.left;
+        var y = evt.clientY-rect.top;
+        if (!onCanvas({x:x, y:y})) return;
         if (drawingLine) {
-            var rect = editor.canvas.getBoundingClientRect();
-            var x = evt.clientX-rect.left;
-            var y = evt.clientY-rect.top;
-            if (onCanvas({x: x, y: y})) {
-                lines[lines.length-1].pt2.x = x;
-                lines[lines.length-1].pt2.y = y;
-            }
+            lines[lines.length-1].pt2.x = x;
+            lines[lines.length-1].pt2.y = y;
         } 
         else if (drawingCircle) {
-            var rect = editor.canvas.getBoundingClientRect();
-            var x = evt.clientX-rect.left;
-            var y = evt.clientY-rect.top;
-            if (onCanvas({x: x, y: y})) {
-                circles[circles.length-1].velocity.x = (x - circles[circles.length-1].center.x) / 10;
-                circles[circles.length-1].velocity.y = (y - circles[circles.length-1].center.y) / 10;
-            }
+            circles[circles.length-1].velocity.x = (x - circles[circles.length-1].center.x) / 10;
+            circles[circles.length-1].velocity.y = (y - circles[circles.length-1].center.y) / 10;
         }
     };
     window.addEventListener('mousemove', getPosition);
