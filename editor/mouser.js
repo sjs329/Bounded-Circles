@@ -47,7 +47,7 @@ var Mouser = function(editor) {
 
     function onCanvas(point) {
         return (point.x > 0 && point.x < editor.dimensions.x && point.y >0 && point.y < editor.dimensions.y);
-    }
+    };
 
     function getPosition(evt) {
         var rect = editor.canvas.getBoundingClientRect();
@@ -85,10 +85,67 @@ var Mouser = function(editor) {
             }
         }
         file += "]\n"
+
+        //Primary weapon
+        file += "primaryWeapon "+document.getElementById("primaryWeaponSelect").value + "\n";
+
+        //Secondary weapon
+        file += "secondaryWeapon "+document.getElementById("secondaryWeaponSelect").value + "\n";
+
+        //Powerups
+        file += "powerup_drop_prob "+document.getElementById("PowerupDropProb").value + "\n";
+        var powerupArray=[],powerupProbs=[];
+        if (document.getElementById("PistolWeight").value > 0) { 
+            powerupArray.push("Pistol"); 
+            powerupProbs.push(document.getElementById("PistolWeight").value)
+        }
+        if (document.getElementById("SMGWeight").value > 0) { 
+
+            powerupArray.push("SMG"); 
+            powerupProbs.push(document.getElementById("SMGWeight").value)
+            // console.log("SMG",powerupArray,powerupProbs)
+        }
+        if (document.getElementById("FlameThrowerWeight").value > 0) { 
+            powerupArray.push("FlameThrower"); 
+            powerupProbs.push(document.getElementById("FlameThrowerWeight").value)
+        }
+        if (document.getElementById("MissileLauncherWeight").value > 0) { 
+            powerupArray.push("MissileLauncher"); 
+            powerupProbs.push(document.getElementById("MissileLauncherWeight").value)
+        }
+        if (document.getElementById("MultiMissileLauncherWeight").value > 0) { 
+            powerupArray.push("MultiMissileLauncher"); 
+            powerupProbs.push(document.getElementById("MultiMissileLauncherWeight").value)
+        }
+        if (document.getElementById("GatlingGunWeight").value > 0) { 
+            powerupArray.push("GatlingGun"); 
+            powerupProbs.push(document.getElementById("GatlingGunWeight").value)
+        }
+        if (document.getElementById("FishWeight").value > 0) { 
+            powerupArray.push("Fish"); 
+            powerupProbs.push(document.getElementById("FishWeight").value)
+        }
+        if (powerupArray.length > 0) {file += "powerups ["}
+        for (var i=0; i<powerupArray.length; i++) {
+            // console.log("Writing ",i)
+            file += ""+powerupArray[i]
+            if (i < powerupArray.length-1) {
+                file += " "
+            }
+        }
+        file += "]\n"
+        if (powerupProbs.length > 0) {file += "powerup_probs ["}
+        for (var i=0; i<powerupProbs.length; i++) {
+            file += ""+powerupProbs[i]
+            if (i < powerupProbs.length-1) {
+                file += " "
+            }
+        }
+        file += "]\n"
+
         saveTextAs(file, "my_awesome_level.lvl");
     }
-    document.getElementById('saveButton').addEventListener('click',
-            saveLevel);
+    document.getElementById('saveButton').addEventListener('click', saveLevel);
 
     function tick() {
         // Clear away the drawing from the previous tick.

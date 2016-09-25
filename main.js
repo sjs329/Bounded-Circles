@@ -184,8 +184,8 @@ var Game = (function(game) {
 
     // rebuild player
     world.player = new game.Player(world.dimensions); //game.levels[level].player;
-    world.player.primaryWeapon = new game.levels[level].primaryWeapon;
-    world.player.secondaryWeapon = new game.levels[level].secondaryWeapon;
+    world.player.primaryWeapon = new game.levels[level].primaryWeapon(world);
+    world.player.secondaryWeapon = new game.levels[level].secondaryWeapon(world);
     world.secondaryWeaponList.push(world.player.secondaryWeapon);
     world.player.secretWeapon = new game.levels[level].secretWeapon;
     world.player.secretWeapon.capacity = 0;

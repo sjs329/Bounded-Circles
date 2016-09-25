@@ -425,10 +425,10 @@ var Game = (function (game){
         }
         else {
           world.secondaryWeaponList.push(this.weaponProto)
-          if (typeof this.weaponProto.exists !== 'undefined') 
-          {
-            world.misc.push(this.weaponProto); //make sure to add any updateable weapons to misc.
-          }
+          // if (typeof this.weaponProto.exists !== 'undefined') 
+          // {
+          //   world.misc.push(this.weaponProto); //make sure to add any updateable weapons to misc.
+          // }
         }
         this.exists = false;
       }

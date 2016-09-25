@@ -49,6 +49,7 @@ var OverheatableWeapon = function(bullet, reload_time, capacity, heat_capacity, 
   this.rounds_remaining = this.capacity;  // Note that it's possible to have rounds_remaining > capacity since picking up the same gun adds ammo
   this.exists = true; // needed so it doesn't get filtered out of the world by world.stillExists
   this.center = { x: 1, y: 1 }; // needed so it doesn't get filtered out of the world by world.stillOnCanvas
+  world.misc.push(this); //make sure to add any updateable weapons to misc.
 };
 
 OverheatableWeapon.prototype = {

@@ -49,7 +49,9 @@ var Game = (function(game) {
 
         //line above weapon info text
         new_level.lines.push({ pt1: { x: 0, y: game.dimensions.y}, pt2: {x:game.dimensions.x, y:game.dimensions.y} })
+
         var file_lines = e.target.result.split('\n');
+        // console.log(file_lines)
         for (var i=0; i<file_lines.length; i++ ) {
           var splits = file_lines[i].split(' ');
           if (splits.length <2 ) continue;
@@ -77,19 +79,27 @@ var Game = (function(game) {
             }
           }
           else if (splits[0] == "num_rand_circles") {
-            new_level.num_rand_circles = parseInt(splits[1]);
+            new_level.num_rand_circles = parseInt(splits[1].trim());
           }
           else if (splits[0] == "primaryWeapon") {
-            new_level.primaryWeapon = window[splits[1]]
+            if (!window[splits[1].trim()]) {
+              console.log("Primary failed on:",splits[1])
+            }
+            new_level.primaryWeapon = window[splits[1].trim()]
+            // console.log("Primary:",new_level.primaryWeapon)
           }
           else if (splits[0] == "secondaryWeapon") {
-            new_level.secondaryWeapon = window[splits[1]]
+            // console.log("Secondary:",new_level.secondaryWeapon)
+            if (!window[splits[1].trim()]) {
+              console.log("Primary failed on:",splits[1])
+            }
+            new_level.secondaryWeapon = window[splits[1].trim()]
           }
           else if (splits[0] == "secretWeapon") {
-            new_level.secretWeapon = window[splits[1]]
+            new_level.secretWeapon = window[splits[1].trim()]
           }
           else if (splits[0] == "powerup_drop_prob") {
-            new_level.powerup_drop_prob = parseFloat(splits[1])
+            new_level.powerup_drop_prob = parseFloat(splits[1].trim())
           }
           else if (splits[0] == "powerups") {
             var powerups = file_lines[i].split('[')[1].split(']')[0].split(' ')
@@ -107,6 +117,7 @@ var Game = (function(game) {
             // console.log("Ignoring line:",file_lines[i])
           }
         }
+        console.log("Adding level:",new_level)
         levels.push(new_level);
       };
       reader.onerror = function(e) {
