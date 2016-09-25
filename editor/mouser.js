@@ -58,8 +58,20 @@ var Mouser = function(editor) {
         var y = evt.clientY-rect.top;
         if (!onCanvas({x:x, y:y})) return;
         if (drawingLine) {
-            lines[lines.length-1].pt2.x = x;
-            lines[lines.length-1].pt2.y = y;
+            if (evt.shiftKey) {
+                var pt1 = lines[lines.length-1].pt1;
+                if (Math.abs(x-pt1.x) > Math.abs(y-pt1.y)) {
+                    // console.log("Horiz line")
+                    lines[lines.length-1].pt2.x = x;
+                    lines[lines.length-1].pt2.y = pt1.y;
+                } else {
+                    lines[lines.length-1].pt2.x = pt1.x;
+                    lines[lines.length-1].pt2.y = y;
+                }
+            } else {
+                lines[lines.length-1].pt2.x = x;
+                lines[lines.length-1].pt2.y = y;
+            }
         } 
         else if (drawingCircle) {
             circles[circles.length-1].velocity.x = (x - circles[circles.length-1].center.x) / 10;
@@ -186,20 +198,15 @@ var Mouser = function(editor) {
         for (var i=0; i<keyPath.length; i++) {
             newObject = newObject[keyPath[i]]; //this is tomfoolary seemingly needed to get the properties to match up to the object
         }
-        console.log("newObject:",newObject)
         if (typeof newObject === "object") {
             var keys = getKeys(newObject);
-            console.log(keys)
             var num = keys.length;
             container.appendChild(document.createElement("br"));
             for (var i=0; i<num; i++) {
                 container.appendChild(document.createTextNode(indent+keys[i]+": "));   
-                // keyPath.push(keys[i])
-                // console.log("keyPath:",keyPath)             
                 makePropertyInputs(object, keyPath.concat(keys[i]), keys[i], indent+"  ", container);
             }
         } else {
-            // container.appendChild(document.createTextNode(indent+name+": "));
             var input = document.createElement("input");
             input.value = newObject;
             input.type = typeof newObject;
@@ -209,15 +216,10 @@ var Mouser = function(editor) {
             //Add event listener
             input.onchange = function() 
                 { 
-                    // console.log(name,"changed:",input.value); 
-                    // console.log(keyPath)
                     var newObject = object;
-                    // object.center = {x:100, y:100}
                     for (var i=0; i<keyPath.length-1; i++) {
-                        // console.log("Key:",keyPath[i])
                         newObject = newObject[keyPath[i]]
                     }
-                    // console.log(keyPath[keyPath.length-1])
                     newObject[keyPath[keyPath.length-1]] = input.value; 
                 }
             // Append a line break 
