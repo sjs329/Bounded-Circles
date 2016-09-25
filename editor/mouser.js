@@ -13,6 +13,7 @@ var Mouser = function(editor) {
         var x = evt.clientX-rect.left;
         var y = evt.clientY-rect.top;
         if (!onCanvas({x:x, y:y})) return;
+        editor.saved = false; //we've changed something
         if (drawingLine) {
             drawingLine = false;
         }
@@ -147,8 +148,25 @@ var Mouser = function(editor) {
         file += "]\n"
 
         saveTextAs(file, "my_awesome_level.lvl");
+        editor.saved = true;
     }
     document.getElementById('saveButton').addEventListener('click', saveLevel);
+
+    function backToGame() {
+        if (editor.saved) {
+            window.location.href = '../index.html';
+        }
+        else {
+            var r = confirm("Warning, the game has not been saved. Would you like to save the game before leaving?\n\nPress Cancel to leave without saving.");
+            if (r == true) {
+                saveLevel();
+                window.location.href = '../index.html';
+            } else {
+                window.location.href = '../index.html';
+            }
+        }
+    }
+    document.getElementById('backToGameButton').addEventListener('click', backToGame);
 
     function tick() {
         // Clear away the drawing from the previous tick.
