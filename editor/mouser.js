@@ -103,7 +103,6 @@ var Mouser = function(editor) {
 
             powerupArray.push("SMG"); 
             powerupProbs.push(document.getElementById("SMGWeight").value)
-            // console.log("SMG",powerupArray,powerupProbs)
         }
         if (document.getElementById("FlameThrowerWeight").value > 0) { 
             powerupArray.push("FlameThrower"); 
@@ -124,6 +123,10 @@ var Mouser = function(editor) {
         if (document.getElementById("FishWeight").value > 0) { 
             powerupArray.push("Fish"); 
             powerupProbs.push(document.getElementById("FishWeight").value)
+        }
+        if (document.getElementById("NewLifeWeight").value > 0) { 
+            powerupArray.push("NewLife"); 
+            powerupProbs.push(document.getElementById("NewLifeWeight").value)
         }
         if (powerupArray.length > 0) {file += "powerups ["}
         for (var i=0; i<powerupArray.length; i++) {
