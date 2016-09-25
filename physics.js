@@ -5,7 +5,11 @@ Line = function( args ) { // pt1, pt2) {
     // console.log(args)
     this.end1 = args.pt1;
     this.end2 = args.pt2;
-    this.color = "black";
+    if (this.end1.y == this.end2.y){
+      this.color = "black";
+    } else {
+      this.color = "LightGray"; //can't land on this
+    }
     this.lifespan = 0; //could use this to make lines disappear over time
     this.age = 0;
     this.exists = true;
