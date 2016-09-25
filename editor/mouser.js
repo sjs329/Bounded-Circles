@@ -16,9 +16,11 @@ var Mouser = function(editor) {
         editor.saved = false; //we've changed something
         if (drawingLine) {
             drawingLine = false;
+            populatePropertyBox(lines[lines.length-1])
         }
         else if (drawingCircle) {
             drawingCircle = false;
+            populatePropertyBox(circles[circles.length-1])
         }
         else if (evt.shiftKey) {
             // shift=left click: draw line
@@ -167,6 +169,70 @@ var Mouser = function(editor) {
         }
     }
     document.getElementById('backToGameButton').addEventListener('click', backToGame);
+
+    function populatePropertyBox(object){
+
+        // Container <div> where dynamic content will be placed
+        var container = document.getElementById("propertyBox");
+        // Clear previous contents of the container
+        while (container.hasChildNodes()) {
+            container.removeChild(container.lastChild);
+        }
+        makePropertyInputs(object, [], "", "", container);
+    }
+
+    function makePropertyInputs(object, keyPath, name, indent, container) { //recursive function
+        var newObject = object;
+        for (var i=0; i<keyPath.length; i++) {
+            newObject = newObject[keyPath[i]]; //this is tomfoolary seemingly needed to get the properties to match up to the object
+        }
+        console.log("newObject:",newObject)
+        if (typeof newObject === "object") {
+            var keys = getKeys(newObject);
+            console.log(keys)
+            var num = keys.length;
+            container.appendChild(document.createElement("br"));
+            for (var i=0; i<num; i++) {
+                container.appendChild(document.createTextNode(indent+keys[i]+": "));   
+                // keyPath.push(keys[i])
+                // console.log("keyPath:",keyPath)             
+                makePropertyInputs(object, keyPath.concat(keys[i]), keys[i], indent+"  ", container);
+            }
+        } else {
+            // container.appendChild(document.createTextNode(indent+name+": "));
+            var input = document.createElement("input");
+            input.value = newObject;
+            input.type = typeof newObject;
+            input.name = "member" + i;
+            
+            container.appendChild(input);
+            //Add event listener
+            input.onchange = function() 
+                { 
+                    // console.log(name,"changed:",input.value); 
+                    // console.log(keyPath)
+                    var newObject = object;
+                    // object.center = {x:100, y:100}
+                    for (var i=0; i<keyPath.length-1; i++) {
+                        // console.log("Key:",keyPath[i])
+                        newObject = newObject[keyPath[i]]
+                    }
+                    // console.log(keyPath[keyPath.length-1])
+                    newObject[keyPath[keyPath.length-1]] = input.value; 
+                }
+            // Append a line break 
+            container.appendChild(document.createElement("br"));
+        }
+        
+    }
+
+    var getKeys = function(obj){
+       var keys = [];
+       for(var key in obj){
+          keys.push(key);
+       }
+       return keys;
+    }
 
     function tick() {
         // Clear away the drawing from the previous tick.
