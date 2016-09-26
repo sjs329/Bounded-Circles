@@ -19,22 +19,60 @@ MTIConfig.EnableCustomFOUTHandler = true // true = prevent FOUT
 <script src="../weapons.js"></script>
 <script src="../physicals.js"></script>
 <script src="../levels.js"></script>
+<script src="items.js"></script>
 <script src="FileSaver.js"></script>
 <script src="mouser.js"></script>
 <script src="editor.js"></script>
 <script src="../main.js"></script>
 
 <style>
-table, th, td {
+  table, th, td {
     /*border: 1px solid black;*/
-}
+  }
 
-th, td {
+  th, td {
     padding: 20px;
     vertical-align: top;
-}
-</style>
+  }
 
+  .dropbtn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+  }
+
+  .dropbtn:hover, .dropbtn:focus {
+    background-color: #3e8e41;
+  }
+
+  .dropdown {
+    position: relative;
+    display: inline-block;
+  }
+
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    /*overflow: auto;*/
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  }
+
+  .dropdown-content a {
+    color: black;
+    padding: 4px 4px;
+    text-decoration: none;
+    display: block;
+  }
+
+  .dropdown a:hover {background-color: #f1f1f1}
+
+  .show {display:block;}
+</style>
 </head>
 <body>
 
@@ -44,10 +82,19 @@ th, td {
     <p><input type="button" id="backToGameButton" value="Back to game" /></p>
     <p><input type="button" id="testLevel" value="Test level" /><input type="button" id="endTest" value="End test" /></p>
     <table> <tr>
-      <td><canvas id="bounded_circles" width="800" height="500"></canvas></td>
+      <td><canvas id="bounded_circles" width="800" height="450"></canvas></td>
       <td>
-      <h3>Item Properties:</h3>
-      <div id="propertyBox"/>
+        <div class="dropdown">
+        <button onclick="selectItem()" class="dropbtn">Select Item</button>
+          <div id="itemDropdown" class="dropdown-content">
+            <!-- <a href="#home">Home</a>
+            <a href="#about">About</a>
+            <a href="#contact">Contact</a> -->
+          </div>
+        </div>
+        <p><h3>Item Properties:</h3></p>
+        
+        <div id="propertyBox"/>
       </td>
     </tr></table>
     <table>
@@ -59,15 +106,15 @@ th, td {
       </tr>
       <tr>
         <td>
-            <select id="primaryWeaponSelect" size="7">
-              <option selected>Pistol</option>
-              <option>SMG</option>
-              <option>FlameThrower</option>
-              <option>MissileLauncher</option>
-              <option>MultiMissileLauncher</option>
-              <option>GatlingGun</option>
-              <option>Fish</option>
-            </select>
+          <select id="primaryWeaponSelect" size="7">
+            <option selected>Pistol</option>
+            <option>SMG</option>
+            <option>FlameThrower</option>
+            <option>MissileLauncher</option>
+            <option>MultiMissileLauncher</option>
+            <option>GatlingGun</option>
+            <option>Fish</option>
+          </select>
         </td>
         <td>
           <form>

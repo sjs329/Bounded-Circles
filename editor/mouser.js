@@ -16,32 +16,31 @@ var Mouser = function(editor, firstStart) {
         editor.saved = false; //we've changed something
         if (drawingLine) {
             drawingLine = false;
-            populatePropertyBox(lines[lines.length-1])
+            
         }
         else if (drawingCircle) {
             drawingCircle = false;
-            populatePropertyBox(circles[circles.length-1])
+            // populatePropertyBox(circles[circles.length-1])
         }
         else if (evt.shiftKey) {
             // shift=left click: draw line
-            var line =  {    
-                            pt1: {x: x, y: y}, 
-                            pt2: {x: x, y: y},
-                            color: "black"
-                        }
+            var line =  new editor.EditorLine(
+                            {x: x, y: y}, //pt1
+                            {x: x, y: y}, //pt2
+                            "black"  //color
+                        )
             lines.push(line)
+            addItemToList(line)
             drawingLine = true;
         }
         else {
             // left click: circle
-            var circle = {  center: 
-                                {   x: x,
-                                    y: y
-                                },
-                            radius: 10,
-                            velocity: {x:0, y:0 }
-                         }
+            var circle = new editor.EditorCircle( 
+                                {x: x, y: y}, //center
+                                {x:0, y:0 } //velocity
+                                )
             circles.push(circle)
+            addItemToList(circle)
             drawingCircle = true;
         }
         
@@ -61,7 +60,6 @@ var Mouser = function(editor, firstStart) {
             if (evt.shiftKey) {
                 var pt1 = lines[lines.length-1].pt1;
                 if (Math.abs(x-pt1.x) > Math.abs(y-pt1.y)) {
-                    // console.log("Horiz line")
                     lines[lines.length-1].pt2.x = x;
                     lines[lines.length-1].pt2.y = pt1.y;
                 } else {
@@ -145,7 +143,6 @@ var Mouser = function(editor, firstStart) {
         }
         if (powerupArray.length > 0) {file += "powerups ["}
         for (var i=0; i<powerupArray.length; i++) {
-            // console.log("Writing ",i)
             file += ""+powerupArray[i]
             if (i < powerupArray.length-1) {
                 file += " "
@@ -202,6 +199,41 @@ var Mouser = function(editor, firstStart) {
     }
     document.getElementById('endTest').addEventListener('click', endTest);
 
+    function addItemToList(item) {
+        var container = document.getElementById("itemDropdown");
+        var para = document.createElement("a");
+        var itemName = ""
+        if (typeof item.center  !== "undefined") {
+            itemName += "Circle ("+item.center.x+", "+item.center.y+")";
+        } else if (typeof item.pt1 !== "undefined") {
+            itemName += "Line ("+item.pt1.x+", "+item.pt1.y+")";
+        } else {
+            itemName = "Unknown"
+        }
+        var text = document.createTextNode(itemName);
+        para.appendChild(text)
+        para.id = item.private_id
+        para.onmouseover = hoverItem
+        para.onclick = selectItem
+        container.appendChild(para);
+    }
+
+    function hoverItem(evt) {
+        var id = evt.target.id;
+        var type = evt.target.innerHTML.split(" ")[0]
+        var array = lines.concat(circles)
+        for (var i=0; i<array.length; i++) {
+            if (""+array[i].private_id == id) {
+                editor.selected_item = array[i]
+                break;
+            }
+        }
+    }
+
+    function selectItem(evt) {
+        populatePropertyBox(editor.selected_item)
+    }
+
     function populatePropertyBox(object){
 
         // Container <div> where dynamic content will be placed
@@ -216,13 +248,14 @@ var Mouser = function(editor, firstStart) {
     function makePropertyInputs(object, keyPath, name, indent, container) { //recursive function
         var newObject = object;
         for (var i=0; i<keyPath.length; i++) {
-            newObject = newObject[keyPath[i]]; //this is tomfoolary seemingly needed to get the properties to match up to the object
+            newObject = newObject[keyPath[i]]; //this is tomfoolary seemingly needed to get the properties to actually reference the object
         }
         if (typeof newObject === "object") {
             var keys = getKeys(newObject);
             var num = keys.length;
             container.appendChild(document.createElement("br"));
             for (var i=0; i<num; i++) {
+                if (typeof newObject[keys[i]] === "function" || keys[i].substr(0,7) == 'private') return;
                 container.appendChild(document.createTextNode(indent+keys[i]+": "));   
                 makePropertyInputs(object, keyPath.concat(keys[i]), keys[i], indent+"  ", container);
             }
@@ -262,13 +295,16 @@ var Mouser = function(editor, firstStart) {
         
         //draw lines
         for (var i=0; i<lines.length; i++) {
-            // console.log("Drawing line",lines[i])
-            editor.drawLine(lines[i])
+            lines[i].draw(editor.screen);
         }
 
         //draw circles
         for (var i=0; i<circles.length; i++) {
-            editor.drawCircle(circles[i])
+            circles[i].draw(editor.screen);
+        }
+
+        if (editor.selected_item) {
+            editor.selected_item.drawSelected(editor.screen);
         }
         
         // Queue up the next call to tick with the browser.
