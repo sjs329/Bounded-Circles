@@ -26,7 +26,7 @@ var Editor = (function(editor) {
 		    screen.fill();
 
 		    //draw velocity arrow
-		    var line = {pt1:this.center, pt2: {x:this.center.x+this.velocity.x*10, y:this.center.y+this.velocity.y*10}, color: "red"}
+		    var line = {pt1:this.center, pt2: {x:this.center.x+(this.velocity.x*10), y:this.center.y+(this.velocity.y*10)}, color: "red"}
 		    screen.beginPath();
 		    screen.lineWidth = 1.5;
 		    screen.moveTo(line.pt1.x, line.pt1.y);

@@ -16,11 +16,9 @@ var Mouser = function(editor, firstStart) {
         editor.saved = false; //we've changed something
         if (drawingLine) {
             drawingLine = false;
-            
         }
         else if (drawingCircle) {
             drawingCircle = false;
-            // populatePropertyBox(circles[circles.length-1])
         }
         else if (evt.shiftKey) {
             // shift=left click: draw line
@@ -240,12 +238,9 @@ var Mouser = function(editor, firstStart) {
         if (typeof editor.selected_item.center !== "undefined") {
             var idx = circles.indexOf(editor.selected_item)
             circles.splice(idx, 1)
-            
-            console.log("removed circle",idx)
         } else if (typeof editor.selected_item.pt1 !== "undefined") {
             var idx = lines.indexOf(editor.selected_item)
             lines.splice(idx, 1)
-            console.log("removed circle",idx)
         }
         else {
             console.log("removed unknown:",editor.selected_item)
@@ -312,7 +307,13 @@ var Mouser = function(editor, firstStart) {
                     for (var i=0; i<keyPath.length-1; i++) {
                         newObject = newObject[keyPath[i]]
                     }
-                    newObject[keyPath[keyPath.length-1]] = input.value; 
+                    if (typeof newObject[keyPath[keyPath.length-1]] == "number") {
+                        newObject[keyPath[keyPath.length-1]] = parseFloat(input.value); 
+                    } else if (typeof newObject[keyPath[keyPath.length-1]] == "string") {
+                        newObject[keyPath[keyPath.length-1]] = input.value; 
+                    } else {
+                        console.log("Bad type",newObject[keyPath[keyPath.length-1]],":",typeof newObject[keyPath[keyPath.length-1]])
+                    }
                 }
             // Append a line break 
             container.appendChild(document.createElement("br"));
