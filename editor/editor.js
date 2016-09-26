@@ -1,27 +1,31 @@
 var Editor = (function(editor) {
-  editor.start = function() {
+  editor.beginEditor = function(evt, firstStart) {
       editor.canvas = document.getElementById('bounded_circles')
       editor.screen = editor.canvas.getContext('2d');
       editor.dimensions = { x: editor.screen.canvas.width, y: editor.screen.canvas.height - 50 };
-      editor.saved = false;
+      editor.editor_mode = true;
+
+
+      if (typeof firstStart == 'undefined' || firstStart == true) {
+        editor.saved = false;
+        
+        //draw border
+        editor.non_game_lines = []
+        //outer border
+        editor.non_game_lines.push({ pt1: { x: 0, y: 0 }, pt2: { x: 0, y: editor.screen.canvas.height } })
+        editor.non_game_lines.push({ pt1: { x: 0, y: editor.screen.canvas.height }, pt2: { x: editor.screen.canvas.width, y: editor.screen.canvas.height } })
+        editor.non_game_lines.push({ pt1: { x: editor.screen.canvas.width, y: editor.screen.canvas.height }, pt2: { x: editor.screen.canvas.width, y: 0 } })
+        editor.non_game_lines.push({ pt1: { x: editor.screen.canvas.width, y: 0 }, pt2: { x: 0, y: 0 } })
+
+        //line above weapon info text
+        editor.non_game_lines.push({ pt1: { x: 0, y: editor.dimensions.y}, pt2: {x:editor.dimensions.x, y:editor.dimensions.y} })
       
-      //draw border
-      editor.non_game_lines = []
-      //outer border
-      editor.non_game_lines.push({ pt1: { x: 0, y: 0 }, pt2: { x: 0, y: editor.screen.canvas.height } })
-      editor.non_game_lines.push({ pt1: { x: 0, y: editor.screen.canvas.height }, pt2: { x: editor.screen.canvas.width, y: editor.screen.canvas.height } })
-      editor.non_game_lines.push({ pt1: { x: editor.screen.canvas.width, y: editor.screen.canvas.height }, pt2: { x: editor.screen.canvas.width, y: 0 } })
-      editor.non_game_lines.push({ pt1: { x: editor.screen.canvas.width, y: 0 }, pt2: { x: 0, y: 0 } })
+        for (var i=0; i<editor.non_game_lines.length; i++) {
+          editor.drawLine(editor.non_game_lines[i])
+        }
 
-      //line above weapon info text
-      editor.non_game_lines.push({ pt1: { x: 0, y: editor.dimensions.y}, pt2: {x:editor.dimensions.x, y:editor.dimensions.y} })
-
-
-      for (var i=0; i<editor.non_game_lines.length; i++) {
-        editor.drawLine(editor.non_game_lines[i])
-      }
-
-      var mouser = new Mouser(editor); //.canvas, editor.screen);
+        var mouser = new Mouser(editor); //.canvas, editor.screen);
+      }    
   };
 
   editor.drawLine = function(line) {
@@ -52,7 +56,7 @@ var Editor = (function(editor) {
     editor.drawLine(line)
   };
 
-  window.addEventListener('load', editor.start);
+  window.addEventListener('load', editor.beginEditor);
   return editor;
 })(Game || {});
 

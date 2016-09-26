@@ -1,4 +1,4 @@
-var Mouser = function(editor) {
+var Mouser = function(editor, firstStart) {
     // for drawing circles.
     var radius = 10;
 
@@ -80,7 +80,7 @@ var Mouser = function(editor) {
     };
     window.addEventListener('mousemove', getPosition);
 
-    function saveLevel() {
+    function getLevelString() {
         // Write circles.
         var file = "circles ["
         for (var i = 0; i < circles.length; i++) {
@@ -161,6 +161,12 @@ var Mouser = function(editor) {
         }
         file += "]\n"
 
+        return file
+    }
+
+    function saveLevel() {
+        var file = getLevelString();
+
         saveTextAs(file, "my_awesome_level.lvl");
         editor.saved = true;
     }
@@ -181,6 +187,20 @@ var Mouser = function(editor) {
         }
     }
     document.getElementById('backToGameButton').addEventListener('click', backToGame);
+
+    function testLevel() {
+        var level = getLevelString();
+
+        editor.editor_mode = false;
+        editor.start(false, [level])
+    }
+    document.getElementById('testLevel').addEventListener('click', testLevel);
+
+    function endTest() {
+        editor.editor_mode = true;
+        editor.beginEditor(null, false)
+    }
+    document.getElementById('endTest').addEventListener('click', endTest);
 
     function populatePropertyBox(object){
 

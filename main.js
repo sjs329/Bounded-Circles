@@ -13,7 +13,7 @@ var Game = (function(game) {
   // var dimensions;
 
   // **start()** creates the lines and circles and starts the simulation.
-  game.start = function(loadDefaults) {
+  game.start = function(loadDefaults, levels) {
 
     // In index.html, there is a canvas tag that the game will be drawn in.
     // Grab that canvas out of the DOM.  From it, get the drawing
@@ -22,6 +22,12 @@ var Game = (function(game) {
     game.dimensions = { x: game.screen.canvas.width, y: game.screen.canvas.height - 50 };
     if (loadDefaults) {
       game.levels = game.buildLevels();
+    }
+    if (levels && levels.length > 0) {
+      game.levels = []
+      for (var i=0; i<levels.length; i++) {
+        game.levels.push(game.readLevel(levels[i]))
+      }
     }
     // document.getElementById('files').addEventListener('change', game.loadLevels, false);
 
@@ -125,7 +131,9 @@ var Game = (function(game) {
       game.draw(world, game.screen);
 
       // Queue up the next call to tick with the browser.
-      requestAnimationFrame(tick);
+      if (typeof game.editor_mode === "undefined" || !game.editor_mode) {
+        requestAnimationFrame(tick);
+      }
 
     };
 
@@ -408,8 +416,11 @@ var Game = (function(game) {
   // When the DOM is ready, start the simulation.
   // window.addEventListener('load', game.start);
   var waitForChange = function () {
-    document.getElementById('files').addEventListener('change', game.loadLevels, false);
-    game.start(true)
+    if (typeof game.editor_mode === "undefined" || !game.editor_mode) {
+      document.getElementById('files').addEventListener('change', game.loadLevels, false);
+      game.start(true)
+    }
+    // game.start(false)
   }
   window.addEventListener('load', waitForChange);
 

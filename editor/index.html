@@ -22,6 +22,7 @@ MTIConfig.EnableCustomFOUTHandler = true // true = prevent FOUT
 <script src="FileSaver.js"></script>
 <script src="mouser.js"></script>
 <script src="editor.js"></script>
+<script src="../main.js"></script>
 
 <style>
 table, th, td {
@@ -41,6 +42,7 @@ th, td {
     <h2>Bounded Circles Level Editor</h2>
     <p><button id="saveButton" type="button">Save Level</button></p>
     <p><input type="button" id="backToGameButton" value="Back to game" /></p>
+    <p><input type="button" id="testLevel" value="Test level" /><input type="button" id="endTest" value="End test" /></p>
     <table> <tr>
       <td><canvas id="bounded_circles" width="800" height="500"></canvas></td>
       <td>
