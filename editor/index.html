@@ -71,6 +71,19 @@ MTIConfig.EnableCustomFOUTHandler = true // true = prevent FOUT
 
   .dropdown a:hover {background-color: #f1f1f1}
 
+  .deletebtn {
+    background-color: red;
+    color: white;
+    padding: 5px;
+    font-size: 12px;
+    border: none;
+    cursor: pointer;
+  }
+
+  .deletebtn:hover, .deletebtn:focus {
+    background-color: #800000;
+  }
+
   .show {display:block;}
 </style>
 </head>
@@ -78,7 +91,7 @@ MTIConfig.EnableCustomFOUTHandler = true // true = prevent FOUT
 
   <div class="grid-element project">
     <h2>Bounded Circles Level Editor</h2>
-    <p><button id="saveButton" type="button">Save Level</button></p>
+    <p><button id="saveButton" type="button">Save Level</button><input type="text" id="save_filename" value="my_awesome_level.lvl"/></p>
     <p><input type="button" id="backToGameButton" value="Back to game" /></p>
     <p><input type="button" id="testLevel" value="Test level" /><input type="button" id="endTest" value="End test" /></p>
     <table> <tr>
@@ -92,8 +105,7 @@ MTIConfig.EnableCustomFOUTHandler = true // true = prevent FOUT
             <a href="#contact">Contact</a> -->
           </div>
         </div>
-        <p><h3>Item Properties:</h3></p>
-        
+        <h3>Item Properties:</h3> <br>
         <div id="propertyBox"/>
       </td>
     </tr></table>

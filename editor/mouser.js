@@ -163,8 +163,8 @@ var Mouser = function(editor, firstStart) {
 
     function saveLevel() {
         var file = getLevelString();
-
-        saveTextAs(file, "my_awesome_level.lvl");
+        var filename = document.getElementById("save_filename")
+        saveTextAs(file, filename.value);
         editor.saved = true;
     }
     document.getElementById('saveButton').addEventListener('click', saveLevel);
@@ -234,15 +234,54 @@ var Mouser = function(editor, firstStart) {
         populatePropertyBox(editor.selected_item)
     }
 
+    function removeItem(evt) {
+
+        //remove from arrays
+        if (typeof editor.selected_item.center !== "undefined") {
+            var idx = circles.indexOf(editor.selected_item)
+            circles.splice(idx, 1)
+            
+            console.log("removed circle",idx)
+        } else if (typeof editor.selected_item.pt1 !== "undefined") {
+            var idx = lines.indexOf(editor.selected_item)
+            lines.splice(idx, 1)
+            console.log("removed circle",idx)
+        }
+        else {
+            console.log("removed unknown:",editor.selected_item)
+        }
+
+        // clear property box
+        clearPropertyBox(document.getElementById("propertyBox"))
+
+        //remove from dropdown
+        var container = document.getElementById("itemDropdown");
+        var item = document.getElementById(editor.selected_item.private_id);
+        container.removeChild(item)
+
+        editor.selected_item = null
+    }
+
     function populatePropertyBox(object){
 
         // Container <div> where dynamic content will be placed
         var container = document.getElementById("propertyBox");
         // Clear previous contents of the container
+        clearPropertyBox(container)
+        makePropertyInputs(object, [], "", "", container);
+        container.appendChild(document.createElement("br"))
+        var deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.onclick = removeItem
+        deleteButton.className = "deletebtn"
+        deleteButton.appendChild(document.createTextNode("Delete"))
+        container.appendChild(deleteButton)
+    }
+
+    function clearPropertyBox(container) {
         while (container.hasChildNodes()) {
             container.removeChild(container.lastChild);
         }
-        makePropertyInputs(object, [], "", "", container);
     }
 
     function makePropertyInputs(object, keyPath, name, indent, container) { //recursive function
