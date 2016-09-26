@@ -2,7 +2,7 @@ var Editor = (function(editor) {
   editor.beginEditor = function(evt, firstStart) {
       editor.canvas = document.getElementById('bounded_circles')
       editor.screen = editor.canvas.getContext('2d');
-      editor.dimensions = { x: editor.screen.canvas.width, y: editor.screen.canvas.height };
+      editor.dimensions = { x: editor.screen.canvas.width, y: editor.screen.canvas.height - 50};
       editor.editor_mode = true;
       editor.selected_item = null;
 
