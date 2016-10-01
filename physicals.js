@@ -651,9 +651,11 @@ var Game = (function (game){
 
   game.AntiGravityParticle.prototype = {
     update: function(world) { 
-      var lateralVariance = 0.05
-      this.velocity.x *= 1 + (Math.random()*lateralVariance - lateralVariance/2);
-      this.velocity.y *= 1 + (Math.random()*lateralVariance - lateralVariance/2);
+      var velocityVariance = 0.0085
+      var variance = matrix.multiply(matrix.unitNormal(this.direction), Math.random()*velocityVariance-velocityVariance/2);
+      this.velocity = matrix.add(this.velocity, variance)
+      // this.velocity.x *= 1 + (Math.random()*velocityVariance - velocityVariance/2);
+      // this.velocity.y *= 1 + (Math.random()*velocityVariance - velocityVariance/2);
 
     }, //nothing to update
 

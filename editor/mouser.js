@@ -5,16 +5,23 @@ var Mouser = function(editor, firstStart) {
     // for recording clicks, to be written to file.
     circles = [];
     lines = [];
+    antiGravityWells = [];
     drawingLine = false;
     drawingCircle = false;
+    drawingAntiGravityWell = false;
+    antiGravityWellStage = 0;
 
     function getCoords(evt) {
+        if (!editor.editor_mode) return;
         var rect = editor.canvas.getBoundingClientRect();
         var x = evt.clientX-rect.left;
         var y = evt.clientY-rect.top;
         if (!onCanvas({x:x, y:y})) return;
         editor.saved = false; //we've changed something
-        if (drawingLine) {
+        if (drawingAntiGravityWell) {
+            drawingAntiGravityWell = false;
+        }
+        else if (drawingLine) {
             drawingLine = false;
         }
         else if (drawingCircle) {
@@ -30,6 +37,17 @@ var Mouser = function(editor, firstStart) {
             lines.push(line)
             addItemToList(line)
             drawingLine = true;
+        }
+        else if (evt.altKey) {
+            var antiGravityWell = new editor.EditorAntiGravityWell(
+                                        {x: x, y: y}, //center
+                                        {x: 0, y: 1}, //direction
+                                        0.01 //acceleration
+                                        )
+            antiGravityWells.push(antiGravityWell)
+            addItemToList(antiGravityWell)
+            drawingAntiGravityWell = true;
+            antiGravityWellStage = 0;
         }
         else {
             // left click: circle
@@ -50,6 +68,7 @@ var Mouser = function(editor, firstStart) {
     };
 
     function getPosition(evt) {
+        if (!editor.editor_mode) return;
         var rect = editor.canvas.getBoundingClientRect();
         var x = evt.clientX-rect.left;
         var y = evt.clientY-rect.top;
@@ -72,6 +91,12 @@ var Mouser = function(editor, firstStart) {
         else if (drawingCircle) {
             circles[circles.length-1].velocity.x = (x - circles[circles.length-1].center.x) / 10;
             circles[circles.length-1].velocity.y = (y - circles[circles.length-1].center.y) / 10;
+        } else if (drawingAntiGravityWell) {
+            var thisWell = antiGravityWells[antiGravityWells.length-1];
+            var vectorToMouse = matrix.vectorBetween(thisWell.center, {x:x, y:y});
+            thisWell.private_acceleration_vector = matrix.multiply(vectorToMouse, 0.001);
+            thisWell.acceleration = matrix.magnitude(thisWell.private_acceleration_vector)
+            thisWell.direction = matrix.unitVector(vectorToMouse);
         }
     };
     window.addEventListener('mousemove', getPosition);
@@ -80,7 +105,7 @@ var Mouser = function(editor, firstStart) {
         // Write circles.
         var file = "circles ["
         for (var i = 0; i < circles.length; i++) {
-            file += circles[i].center.x + " " + circles[i].center.y + " " + circles[i].velocity.x + " " +circles[i].velocity.y;
+            file += circles[i].toString()
             if (i < circles.length - 1) {
                 file += ","
             }
@@ -90,8 +115,18 @@ var Mouser = function(editor, firstStart) {
         // Write lines
         file += "lines ["
         for (var i=0; i<lines.length; i++) {
-            file += lines[i].pt1.x + " " + lines[i].pt1.y + " " + lines[i].pt2.x + " " + lines[i].pt2.y;
+            file += lines[i].toString()
             if (i < lines.length - 1) {
+                file += ","
+            }
+        }
+        file += "]\n"
+
+        // Write antiGravityWells
+        file += "antiGravityWells ["
+        for (var i=0; i<antiGravityWells.length; i++) {
+            file += antiGravityWells[i].toString()
+            if (i < antiGravityWells.length - 1) {
                 file += ","
             }
         }
@@ -201,11 +236,13 @@ var Mouser = function(editor, firstStart) {
         var container = document.getElementById("itemDropdown");
         var para = document.createElement("a");
         var itemName = ""
-        if (typeof item.center  !== "undefined") {
+        if (item.private_type == "Circle") {
             itemName += "Circle ("+item.center.x+", "+item.center.y+")";
-        } else if (typeof item.pt1 !== "undefined") {
+        } else if (item.private_type == "Line") {
             itemName += "Line ("+item.pt1.x+", "+item.pt1.y+")";
-        } else {
+        } else if (item.private_type == "AntiGravityWell") {
+            itemName += "AntiGravityWell ("+item.center.x+", "+item.center.y+")";
+        }else {
             itemName = "Unknown"
         }
         var text = document.createTextNode(itemName);
@@ -219,13 +256,17 @@ var Mouser = function(editor, firstStart) {
     function hoverItem(evt) {
         var id = evt.target.id;
         var type = evt.target.innerHTML.split(" ")[0]
-        var array = lines.concat(circles)
+        var array = getBodies();
         for (var i=0; i<array.length; i++) {
             if (""+array[i].private_id == id) {
                 editor.selected_item = array[i]
                 break;
             }
         }
+    }
+
+    function getBodies() {
+        return lines.concat(circles).concat(antiGravityWells);
     }
 
     function selectItem(evt) {
@@ -235,12 +276,15 @@ var Mouser = function(editor, firstStart) {
     function removeItem(evt) {
 
         //remove from arrays
-        if (typeof editor.selected_item.center !== "undefined") {
+        if (editor.selected_item.private_type == "Circle") {
             var idx = circles.indexOf(editor.selected_item)
             circles.splice(idx, 1)
-        } else if (typeof editor.selected_item.pt1 !== "undefined") {
+        } else if (editor.selected_item.private_type == "Line") {
             var idx = lines.indexOf(editor.selected_item)
             lines.splice(idx, 1)
+        } else if (editor.selected_item.private_type == "AntiGravityWell") {
+            var idx = antiGravityWells.indexOf(editor.selected_item)
+            antiGravityWells.splice(idx, 1)
         }
         else {
             console.log("removed unknown:",editor.selected_item)
@@ -303,6 +347,7 @@ var Mouser = function(editor, firstStart) {
             //Add event listener
             input.onchange = function() 
                 { 
+                    editor.saved = false; //we've changed something
                     var newObject = object;
                     for (var i=0; i<keyPath.length-1; i++) {
                         newObject = newObject[keyPath[i]]
@@ -333,14 +378,10 @@ var Mouser = function(editor, firstStart) {
         // Clear away the drawing from the previous tick.
         editor.screen.clearRect(1, 1, editor.dimensions.x-2, editor.dimensions.y-2); //but don't clear the border lines
         
-        //draw lines
-        for (var i=0; i<lines.length; i++) {
-            lines[i].draw(editor.screen);
-        }
-
-        //draw circles
-        for (var i=0; i<circles.length; i++) {
-            circles[i].draw(editor.screen);
+        //draw stuff
+        var bodies = getBodies();
+        for (var i=0; i<bodies.length; i++) {
+            bodies[i].draw(editor.screen);
         }
 
         if (editor.selected_item) {

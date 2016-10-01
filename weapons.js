@@ -111,7 +111,7 @@ function SMG(world) {
 };
 
 function GatlingGun(world) {
-  return new OverheatableWeapon(FastBullet, 2 , 300, 400, 0.75, "Gatling Gun", "yellow", "G", world);
+  return new OverheatableWeapon(FastBullet, 2 , 300, 550, 0.75, "Gatling Gun", "yellow", "G", world);
 };
 
 function MissileLauncher(world) {

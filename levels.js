@@ -52,6 +52,7 @@ var Game = (function(game) {
   {
     new_level = new Level({ lines:[], 
                               circles:[], 
+                              antiGravityWells:[],
                               num_rand_circles:0, 
                               primaryWeapon:Pistol, 
                               secondaryWeapon:Fish, 
@@ -94,8 +95,21 @@ var Game = (function(game) {
           var vel = {x:parseFloat(values[2]),y:parseFloat(values[3])}
           // console.log("Game dims:",game.dimensions,"(",j,")")
           var args = {gameSize:game.dimensions, center:center, velocity:vel}
-          var circle = new game.Circle(args)
-          new_level.circles.push(circle)
+          // var circle = new game.Circle(args)
+          new_level.circles.push(args)
+        }
+      }
+      else if (splits[0] == "antiGravityWells") {
+        var antiGravityWells = file_lines[i].split('[')[1].split(']')[0].split(',')
+        for (var j=0; j<antiGravityWells.length; j++) {
+          var values = antiGravityWells[j].split(' ')
+          var center = {x:parseFloat(values[0]),y:parseFloat(values[1])}
+          var direction = {x:parseFloat(values[2]),y:parseFloat(values[3])}
+          var acceleration = parseFloat(values[4])
+          // console.log("Game dims:",game.dimensions,"(",j,")")
+          var args = {center:center, direction:direction, acceleration:acceleration}
+          // var antiGravityWell = new game.AntiGravityWell(args)
+          new_level.antiGravityWells.push(args)
         }
       }
       else if (splits[0] == "num_rand_circles") {
@@ -168,9 +182,11 @@ var Game = (function(game) {
           },
         ],
 
-        // antiGravityWells: [
-        //   { center: { x: game.dimensions.x/2, y: game.dimensions.y-50 }, direction: { x: 0, y: -2 }, acceleration: 0.1 }
-        // ],
+        antiGravityWells: [
+          { center: { x: game.dimensions.x/2-75, y: game.dimensions.y-45 }, direction: { x: -1, y: -2 }, acceleration: 0.1 },
+          { center: { x: game.dimensions.x/2, y: game.dimensions.y-50 }, direction: { x: 0, y: -2 }, acceleration: 0.06 },
+          { center: { x: game.dimensions.x/2+75, y: game.dimensions.y-45 }, direction: { x: 1, y: -2 }, acceleration: 0.1 }
+        ],
 
         num_rand_circles: 0, // these will be created in addition to the ones defined above
 
