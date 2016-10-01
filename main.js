@@ -173,6 +173,7 @@ var Game = (function(game) {
     world.misc.length = 0;
     world.projectiles.length = 0;    
     world.secondaryWeaponList.length = 0;
+    //anything in world.persistant remains through resets / level changes
 
     // rebuild lines and circles if they exists in this level
     if (game.levels[level].lines) 
@@ -188,6 +189,10 @@ var Game = (function(game) {
       world.circles.length = 0;
       game.buildCircles(world, game.levels[level].circles, game.levels[level].num_rand_circles);
       // console.log("Circles:",game.levels[level].circles)
+    }
+
+    if (game.levels[level].antiGravityWells) {
+      game.buildAntiGravityWells(world, game.levels[level].antiGravityWells)
     }
 
     // rebuild player
@@ -280,6 +285,14 @@ var Game = (function(game) {
           }
         }
       }
+    }
+  };
+
+  game.buildAntiGravityWells = function(world, antiGravityWells)
+  {
+    for (var i=0; i<antiGravityWells.length; i++)
+    {
+      world.misc.push(new game.AntiGravityWell(antiGravityWells[i]));
     }
   };
 

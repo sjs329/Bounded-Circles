@@ -42,7 +42,8 @@ var physics = {
   // **applyGravity()** adds gravity to the velocity of `circle`.
   applyGravity: function(body) {
     if (typeof body.gravity == 'undefined') return;
-    body.velocity.y += body.gravity;
+    body.velocity = matrix.add(body.velocity, body.gravity)
+    // body.velocity.y += body.gravity;
   },
 
   applyAirResistance: function(body) {
@@ -58,7 +59,7 @@ var physics = {
   moveBody: function(body) {
     if (typeof body.velocity == 'undefined') return;
     body.center.x += body.velocity.x;
-    if (body.velocity.y < 0 || body.center.y < body.floor) {
+    if (body.floor == 'undefined' || body.velocity.y < 0 || body.center.y < body.floor) {
       body.center.y += body.velocity.y;
     }
     else

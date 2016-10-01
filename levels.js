@@ -11,6 +11,7 @@ var Game = (function(game) {
   var Level = function(args) { //level_num, lines, num_circles, circles, player, primaryWeapon, secondaryWeapon, secretWeapon){
     this.lines = args.lines;
     this.circles = args.circles;
+    this.antiGravityWells = args.antiGravityWells;
     this.num_rand_circles = args.num_rand_circles;
     this.primaryWeapon = args.primaryWeapon;
     this.secondaryWeapon = args.secondaryWeapon; //secondary weapon you start with
@@ -138,8 +139,6 @@ var Game = (function(game) {
     }
     return new_level
   }
-
-
   
   game.buildLevels = function() 
   {
@@ -168,6 +167,11 @@ var Game = (function(game) {
             velocity: { x: 1, y: 0 }
           },
         ],
+
+        // antiGravityWells: [
+        //   { center: { x: game.dimensions.x/2, y: game.dimensions.y-50 }, direction: { x: 0, y: -2 }, acceleration: 0.1 }
+        // ],
+
         num_rand_circles: 0, // these will be created in addition to the ones defined above
 
         primaryWeapon: Pistol,
@@ -264,6 +268,7 @@ var Game = (function(game) {
         ],
 
         circles: [],
+        
         num_rand_circles: 8, // these will be created in addition to the ones defined above
         
         primaryWeapon: Pistol,

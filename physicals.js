@@ -10,9 +10,11 @@ var Game = (function (game){
     this.health = 100;
     this.exists = true;
     this.circle_checked = false;
+    this.type = "Circle";
     this.hit_area = 10;
     this.mass = 1;
-    this.gravity = 0.06;
+    this.gravity = {x: 0.0, y: 0.06};
+    this.default_gravity = {x: 0.0, y: 0.06};
     this.air_resist = 0.0002;
     this.floor = 100000; //larger number so that the circle is allowed to intersect the floor. this is how we detect collisions
   };
@@ -58,6 +60,7 @@ var Game = (function (game){
     draw: function(screen) {
       screen.beginPath();
       screen.strokeStyle = "black"
+      screen.lineWidth = 1.5;
       screen.arc(this.center.x, this.center.y, this.radius, 0, Math.PI * 2, true);
       screen.closePath();
       screen.stroke();
@@ -124,7 +127,8 @@ var Game = (function (game){
     this.velocity = { x: 0, y: 0};
     this.type = "player";
     this.speed = 3;
-    this.gravity = 0.25;
+    this.gravity = {x: 0.0, y: 0.25};
+    this.default_gravity = {x: 0.0, y: 0.25};
     this.air_resist = 0.0;
     this.alive = true;
 
@@ -163,6 +167,7 @@ var Game = (function (game){
         // make sure we don't jump through the roof
         if (this.center.y-(this.size.y/2) <= 0) {
           this.center.y = (this.size.y/2);
+          this.velocity.y = 0; //stop moving up
         }
 
         // Key presses
@@ -358,7 +363,8 @@ var Game = (function (game){
     this.lifespan = lifespan;
     this.exists = true;
     this.age = 0;
-    this.gravity = 0.07;
+    this.gravity = {x: 0.0, y: 0.07};
+    this.default_gravity = {x: 0.0, y: 0.07};
     this.air_resist = 0.005;
     this.floor = dimensions.y - this.size.y;
   };
@@ -392,7 +398,8 @@ var Game = (function (game){
     this.lifespan = 400;
     this.exists = true;
     this.age = 0;
-    this.gravity = 0.06;
+    this.gravity = {x: 0.0, y: 0.06};
+    this.default_gravity = {x: 0.0, y: 0.06};
     this.air_resist = 0.0;
     this.floor = dimensions.y - this.size.y;
   };
@@ -470,7 +477,8 @@ var Game = (function (game){
     this.type = "text"
     this.exists = true;
     this.age = 0;
-    this.gravity = 0.0;
+    this.gravity = {x: 0.0, y: 0.0};
+    this.default_gravity = {x: 0.0, y: 0.0};
     this.air_resist = 0.0;
     this.floor = 10000;
   };
@@ -512,7 +520,8 @@ var Game = (function (game){
     this.velocity = {x:0, y:0};
     this.type = "fillbar"
     this.exists = true;
-    this.gravity = 0.0;
+    this.gravity = {x: 0.0, y: 0.0};
+    this.default_gravity = {x: 0.0, y: 0.0};
     this.air_resist = 0.0;
     this.floor = 10000;
     this.draw_border = draw_border || false;
@@ -539,9 +548,118 @@ var Game = (function (game){
       if (this.draw_border) {
         screen.beginPath();
         screen.strokeStyle = "black"
+        screen.lineWidth = 1.5;
         screen.rect(this.center.x - this.size.x / 2, this.center.y - this.size.y / 2, this.size.x, this.size.y);
         screen.stroke();
       }
+    }
+  };
+
+  game.AntiGravityWell = function(args) {
+    this.center = args.center;
+    this.direction = matrix.unitVector(args.direction);
+    this.acceleration = matrix.multiply(this.direction, args.acceleration);
+    this.particleProbability = 1-args.acceleration;
+    this.type = "AntiGravityWell";
+    this.exists = true;
+    this.capturedObjects = [];
+    this.length = 50;
+    this.end1 = {x: this.center.x + matrix.unitNormal(this.direction).x*this.length/2, y: this.center.y + matrix.unitNormal(this.direction).y*this.length/2};
+    this.end2 = {x: this.center.x - matrix.unitNormal(this.direction).x*this.length/2, y: this.center.y - matrix.unitNormal(this.direction).y*this.length/2};
+  };
+
+  game.AntiGravityWell.prototype = {
+    emitParticle: function(world) {
+      var center = matrix.add(matrix.multiply(matrix.vectorBetween(this.end1, this.end2), Math.random()), this.end1);
+      var particle = new game.AntiGravityParticle({ center: center, direction: this.direction })
+      world.misc.push(particle)
+    },
+
+    objectInWell: function(object) {
+      // if the closest point on the line is one of the ends, we're not within the projection
+      var closestPoint = trig.pointOnLineClosestToCircle(object, {end1:this.end1, end2:this.end2})
+      if (geometry.pointsEqual(closestPoint, this.end1) || geometry.pointsEqual(closestPoint, this.end2)) {
+        return false; //point lies outside line segment, we're not in the well
+      }
+      var projection = matrix.dotProduct(this.direction, matrix.vectorBetween(closestPoint,object.center));
+      if (projection <= 0) {
+        return false; //we're on the wrong side of the well
+      }
+      
+      return true;// it's a trap!
+    },
+
+    update: function(world) { 
+      if (Math.random() > this.particleProbability) {
+        this.emitParticle(world);
+      }
+
+      //restore gravity to any captured items that have escaped:
+      for (var i=0; i<this.capturedObjects.length; i++) {
+        var object = this.capturedObjects[i];
+        if (!this.objectInWell(object)) {
+          object.gravity.x = object.default_gravity.x; //this.capturedObjects[i].originalGravity.x;
+          object.gravity.y = object.default_gravity.y; //this.capturedObjects[i].originalGravity.y;
+        }
+      }
+
+      //clear captured object array
+      this.capturedObjects.length = 0;
+
+      //Look for newly captured objects
+      var bodies = world.circles.concat(world.player);
+      for (var i = 0; i < bodies.length; i++) {
+        if (this.objectInWell(bodies[i])) {
+          bodies[i].gravity.x = this.acceleration.x;
+          bodies[i].gravity.y = this.acceleration.y;
+          this.capturedObjects.push(bodies[i]);
+        }
+      }
+
+    },
+
+    draw: function(screen) {
+      //draw line perpendicular to direction
+      screen.strokeStyle = "blue";
+      screen.beginPath();
+      screen.lineWidth = 5;
+      screen.moveTo(this.end1.x, this.end1.y);
+      screen.lineTo(this.end2.x, this.end2.y);
+      screen.closePath();
+      screen.stroke();
+      screen.strokeStyle = "cyan";
+      screen.beginPath();
+      screen.lineWidth = 1;
+      screen.moveTo(this.end1.x, this.end1.y);
+      screen.lineTo(this.end2.x, this.end2.y);
+      screen.closePath();
+      screen.stroke();
+    }
+  };
+
+  game.AntiGravityParticle = function(args) {
+    this.center = args.center;
+    this.direction = matrix.unitVector(args.direction);
+    var speed = Math.random() * 0.6 +0.4;
+    this.velocity = matrix.multiply(this.direction, speed);
+    // this.gravity {x: 0.0, y: = 0.0};
+    this.size = { x: 1.5, y: 1.5 }
+    this.type = "AntiGravityParticle"
+    this.exists = true;
+    this.floor = 10000;
+  };
+
+  game.AntiGravityParticle.prototype = {
+    update: function(world) { 
+      var lateralVariance = 0.05
+      this.velocity.x *= 1 + (Math.random()*lateralVariance - lateralVariance/2);
+      this.velocity.y *= 1 + (Math.random()*lateralVariance - lateralVariance/2);
+
+    }, //nothing to update
+
+    draw: function(screen) {
+      screen.fillStyle="blue";
+      screen.fillRect(this.center.x - this.size.x / 2, this.center.y - this.size.y / 2, this.size.x, this.size.y);
     }
   };
 

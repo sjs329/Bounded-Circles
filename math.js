@@ -13,17 +13,13 @@ var trig = {
   // closest to `circle`.
   pointOnLineClosestToCircle: function(circle, line) {
 
-    // Get the points at each end of `line`.
-    var lineEndPoint1 = line.end1;
-    var lineEndPoint2 = line.end2;
-
     // Create a vector that represents the line
     var lineUnitVector = matrix.unitVector(
-      matrix.vectorBetween(lineEndPoint1, lineEndPoint2));
+      matrix.vectorBetween(line.end1, line.end2));
 
     // Pick a line end and create a vector that represents the
     // imaginary line between the end and the circle.
-    var lineEndToCircleVector = matrix.vectorBetween(lineEndPoint1, circle.center);
+    var lineEndToCircleVector = matrix.vectorBetween(line.end1, circle.center);
 
     // Get a dot product of the vector between the line end and circle, and
     // the line vector.  (See the `dotProduct()` function for a
@@ -34,22 +30,22 @@ var trig = {
     var projection = matrix.dotProduct(lineEndToCircleVector, lineUnitVector);
 
     // If `projection` is less than or equal to 0, the closest point
-    // is at or past `lineEndPoint1`.  So, return `lineEndPoint1`.
+    // is at or past `line.end1`.  So, return `line.end1`.
     if (projection <= 0) {
-      return lineEndPoint1;
+      return line.end1;
 
     // If `projection` is greater than or equal to the length of the
-    // line, the closest point is at or past `lineEndPoint2`.  So,
-    // return `lineEndPoint2`.
-    } else if (projection >= line.len) {
-      return lineEndPoint2;
+    // line, the closest point is at or past `line.end2`.  So,
+    // return `line.end2`.
+    } else if (projection >= trig.distance(line.end1, line.end2)) {
+      return line.end2;
 
     // The projection indicates a point part way along the line.
     // Return that point.
     } else {
       return {
-        x: lineEndPoint1.x + lineUnitVector.x * projection,
-        y: lineEndPoint1.y + lineUnitVector.y * projection
+        x: line.end1.x + lineUnitVector.x * projection,
+        y: line.end1.y + lineUnitVector.y * projection
       };
     }
   },
@@ -139,6 +135,24 @@ var trig = {
   }
 };
 
+var geometry = {
+  //entirely untested
+  pointInPolygon: function(point, polygon) {
+    var inersectionCount = 0;
+    for (var i=0; i<polygon.length; i++) {
+      var line = polygon[i];
+      if (getIntersectionPoint(line, {end1:point, end2: {x:0, y:0}}).failed == false) {
+        intersectionCount++;
+      }
+    }
+    return (intersection % 2) != 0; //odd number of intersections means point is in polygon
+  },
+
+  pointsEqual: function(point1, point2) {
+    return point1.x == point2.x && point1.y == point2.y
+  }
+}
+
 var matrix = {
 
   // **magnitude()** returns the magnitude of the passed vector.
@@ -168,6 +182,11 @@ var matrix = {
   // of ground covered by the ball.
   dotProduct: function(vector1, vector2) {
     return vector1.x * vector2.x + vector1.y * vector2.y;
+  },
+
+  //returns the unit vector in the direction normal to the given vector, (rotated 90 degrees counter-clockwise)
+  unitNormal: function(vector1) {
+    return { x: -vector1.y, y: vector1.x}
   },
 
   multiply: function(vector, scalar) {
