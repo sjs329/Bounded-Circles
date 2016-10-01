@@ -118,241 +118,241 @@ var Game = (function (game){
   };
 
 
-  // **new Player()** creates a player.
-  game.Player = function(gameSize) {
-    this.gameSize = gameSize;
-    this.size = { x: 15, y: 15 };
-    this.center = { x: gameSize.x / 2, y: Math.round(gameSize.y - this.size.y/2) };
-    this.floor = gameSize.y-this.size.y/2;
-    this.velocity = { x: 0, y: 0};
-    this.type = "player";
-    this.speed = 3;
-    this.gravity = {x: 0.0, y: 0.25};
-    this.default_gravity = {x: 0.0, y: 0.25};
-    this.air_resist = 0.0;
-    this.alive = true;
+  // // **new Player()** creates a player.
+  // game.Player = function(gameSize) {
+  //   this.gameSize = gameSize;
+  //   this.size = { x: 15, y: 15 };
+  //   this.center = { x: gameSize.x / 2, y: Math.round(gameSize.y - this.size.y/2) };
+  //   this.floor = gameSize.y-this.size.y/2;
+  //   this.velocity = { x: 0, y: 0};
+  //   this.type = "player";
+  //   this.speed = 3;
+  //   this.gravity = {x: 0.0, y: 0.25};
+  //   this.default_gravity = {x: 0.0, y: 0.25};
+  //   this.air_resist = 0.0;
+  //   this.alive = true;
 
-    // Create a keyboard object to track button presses.
-    this.keyboarder = new Keyboarder();
-    this.h_pressed = false;
+  //   // Create a keyboard object to track button presses.
+  //   this.keyboarder = new Keyboarder();
+  //   this.h_pressed = false;
 
-    this.primaryWeapon = Pistol();
-    this.secondaryWeapon = Fish();
-    this.secondaryWeaponInd = 0;
-    this.secondaryWeaponTemp = new game.FillBar({x: this.center.x, y: this.center.y-11}, {x: 15, y: 3}, 'red', 0, false)
-    this.secretWeapon = FlameThrower();
-    this.secretWeapon.capacity = 0;
-    this.shield = ShieldGun();
-  };
+  //   this.primaryWeapon = Pistol();
+  //   this.secondaryWeapon = Fish();
+  //   this.secondaryWeaponInd = 0;
+  //   this.secondaryWeaponTemp = new game.FillBar({x: this.center.x, y: this.center.y-11}, {x: 15, y: 3}, 'red', 0, false)
+  //   this.secretWeapon = FlameThrower();
+  //   this.secretWeapon.capacity = 0;
+  //   this.shield = ShieldGun();
+  // };
 
-  game.Player.prototype = {
-    // **update()** updates the state of the player for a single tick.
-    update: function(world) {  
-      if (this.alive) {
-        // Check for death
-        for (var i=0; i<world.circles.length; i++){
-          if (trig.distance(this.center, world.circles[i].center) <= (world.circles[i].radius+this.size.x/2)) {
-            this.alive = false; //we're dead!
-            this.explode(world);
-            if (typeof this.secondaryWeapon.temperature !== 'undefined')
-              this.secondaryWeapon.temperature = 0; //make sure the temp bar goes away
+  // game.Player.prototype = {
+  //   // **update()** updates the state of the player for a single tick.
+  //   update: function(world) {  
+  //     if (this.alive) {
+  //       // Check for death
+  //       for (var i=0; i<world.circles.length; i++){
+  //         if (trig.distance(this.center, world.circles[i].center) <= (world.circles[i].radius+this.size.x/2)) {
+  //           this.alive = false; //we're dead!
+  //           this.explode(world);
+  //           if (typeof this.secondaryWeapon.temperature !== 'undefined')
+  //             this.secondaryWeapon.temperature = 0; //make sure the temp bar goes away
 
-            return;
-          }
-        }
+  //           return;
+  //         }
+  //       }
 
-        // if we're falling, check to see if we fall through a line
-        physics.updateFloor(world, this);
+  //       // if we're falling, check to see if we fall through a line
+  //       physics.updateFloor(world, this);
 
-        // make sure we don't jump through the roof
-        if (this.center.y-(this.size.y/2) <= 0) {
-          this.center.y = (this.size.y/2);
-          this.velocity.y = 0; //stop moving up
-        }
+  //       // make sure we don't jump through the roof
+  //       if (this.center.y-(this.size.y/2) <= 0) {
+  //         this.center.y = (this.size.y/2);
+  //         this.velocity.y = 0; //stop moving up
+  //       }
 
-        // Key presses
-        // If left cursor key is down...
-        if (this.keyboarder.isDown(this.keyboarder.KEYS.A)) {
-          // ... move left.
-          if (this.center.x-Math.round(this.size.x/2) > 0) {
-            this.velocity.x = -this.speed;  
-          } else {
-            this.velocity.x = 0;
-          }
-        } else if (this.keyboarder.isDown(this.keyboarder.KEYS.D)) {
-          if (this.center.x+Math.round(this.size.x/2) < this.gameSize.x) {
-            this.velocity.x = this.speed;  
-          } else {
-            this.velocity.x = 0;
-          }
-        } else {
-          this.velocity.x = 0;
-        }
+  //       // Key presses
+  //       // If left cursor key is down...
+  //       if (this.keyboarder.isDown(this.keyboarder.KEYS.A)) {
+  //         // ... move left.
+  //         if (this.center.x-Math.round(this.size.x/2) > 0) {
+  //           this.velocity.x = -this.speed;  
+  //         } else {
+  //           this.velocity.x = 0;
+  //         }
+  //       } else if (this.keyboarder.isDown(this.keyboarder.KEYS.D)) {
+  //         if (this.center.x+Math.round(this.size.x/2) < this.gameSize.x) {
+  //           this.velocity.x = this.speed;  
+  //         } else {
+  //           this.velocity.x = 0;
+  //         }
+  //       } else {
+  //         this.velocity.x = 0;
+  //       }
 
-        if (this.center.y >= this.floor){
-          if (this.keyboarder.isDown(this.keyboarder.KEYS.SPACE) || this.keyboarder.isDown(this.keyboarder.KEYS.W)) {
-              this.velocity.y -= 6;
-          }
-        }
-        if (this.keyboarder.isDown(this.keyboarder.KEYS.S)) {
-          this.velocity.y += 0.25;
-        }
+  //       if (this.center.y >= this.floor){
+  //         if (this.keyboarder.isDown(this.keyboarder.KEYS.SPACE) || this.keyboarder.isDown(this.keyboarder.KEYS.W)) {
+  //             this.velocity.y -= 6;
+  //         }
+  //       }
+  //       if (this.keyboarder.isDown(this.keyboarder.KEYS.S)) {
+  //         this.velocity.y += 0.25;
+  //       }
 
-        if (world.time - this.primaryWeapon.last_fired >= this.primaryWeapon.reload_time) 
-        {
-          if (this.keyboarder.isDown(this.keyboarder.KEYS.K)) 
-          {
-            this.primaryWeapon.fire({ x: this.center.x, y: this.center.y - this.size.y - this.size.y/3 }, { x: 0, y: -1 }, world);
-          } 
-          else if(this.keyboarder.isDown(this.keyboarder.KEYS.L)) 
-          {
-            this.primaryWeapon.fire({ x: this.center.x, y: this.center.y + this.size.y + this.size.y/3 }, { x: 0, y: 1 }, world);
-          } 
-        }
-        if (world.time - this.secondaryWeapon.last_fired >= this.secondaryWeapon.reload_time) 
-        {
-          if (this.keyboarder.isDown(this.keyboarder.KEYS.J))  
-          {
-            this.secondaryWeapon.fire({ x: this.center.x, y: this.center.y - this.size.y - this.size.y/3 }, { x: 0, y: -1 }, world);
-          }
-        }
-        if (world.time - this.secretWeapon.last_fired >= this.secretWeapon.reload_time)
-        {
-          if (this.keyboarder.isDown(this.keyboarder.KEYS.SIX))
-          {
-            this.secretWeapon.fire({ x: this.center.x, y: this.center.y - this.size.y - this.size.y/3 }, { x: 0, y: -1 }, world);
-          }
-        }
-        if (world.time - this.shield.last_fired >= this.shield.reload_time)
-        {
-          if (this.keyboarder.isDown(this.keyboarder.KEYS.I))
-          {
-            this.shield.fire({ x: this.center.x, y: this.center.y }, { x: 0, y: 0 }, world);
-          }
-        }
-      }
+  //       if (world.time - this.primaryWeapon.last_fired >= this.primaryWeapon.reload_time) 
+  //       {
+  //         if (this.keyboarder.isDown(this.keyboarder.KEYS.K)) 
+  //         {
+  //           this.primaryWeapon.fire({ x: this.center.x, y: this.center.y - this.size.y - this.size.y/3 }, { x: 0, y: -1 }, world);
+  //         } 
+  //         else if(this.keyboarder.isDown(this.keyboarder.KEYS.L)) 
+  //         {
+  //           this.primaryWeapon.fire({ x: this.center.x, y: this.center.y + this.size.y + this.size.y/3 }, { x: 0, y: 1 }, world);
+  //         } 
+  //       }
+  //       if (world.time - this.secondaryWeapon.last_fired >= this.secondaryWeapon.reload_time) 
+  //       {
+  //         if (this.keyboarder.isDown(this.keyboarder.KEYS.J))  
+  //         {
+  //           this.secondaryWeapon.fire({ x: this.center.x, y: this.center.y - this.size.y - this.size.y/3 }, { x: 0, y: -1 }, world);
+  //         }
+  //       }
+  //       if (world.time - this.secretWeapon.last_fired >= this.secretWeapon.reload_time)
+  //       {
+  //         if (this.keyboarder.isDown(this.keyboarder.KEYS.SIX))
+  //         {
+  //           this.secretWeapon.fire({ x: this.center.x, y: this.center.y - this.size.y - this.size.y/3 }, { x: 0, y: -1 }, world);
+  //         }
+  //       }
+  //       if (world.time - this.shield.last_fired >= this.shield.reload_time)
+  //       {
+  //         if (this.keyboarder.isDown(this.keyboarder.KEYS.I))
+  //         {
+  //           this.shield.fire({ x: this.center.x, y: this.center.y }, { x: 0, y: 0 }, world);
+  //         }
+  //       }
+  //     }
       
-      if (!world.running) //this level is over
-      {
-        if (world.player.alive) //we won!
-        {
-          if (this.keyboarder.isDown(this.keyboarder.KEYS.N))
-          {
-            var next_level = world.level + 1;
-            if (next_level < game.levels.length) {
-              world.score += world.level_score;
-              game.reset(world, world.level + 1, world.lives);
-            }
-            else
-              console.log("No more levels!");
-          }
-          if (this.keyboarder.isDown(this.keyboarder.KEYS.R))
-          {
-            if (world.level < game.levels.length-1) {
-              game.reset(world, world.level, world.lives); //restart level
-            } else {
-              world.score = 0;
-              game.reset(world, 0); //restart game
-            }
-          }
-        }
-        else { //we're dead :(
-          if (this.keyboarder.isDown(this.keyboarder.KEYS.R)) {
-            world.lives--;
-            if (world.lives > 0 && world.circles.length > 0) {
-              game.reset(world, world.level, world.lives);
-            }
-            else {
-              world.score = 0;
-              game.reset(world, 0);
-            }
-          }
-        }
-      }
-      else {
-        if (this.keyboarder.isDown(this.keyboarder.KEYS.R))
-        {
-          game.reset(world, world.level, world.lives); //allow resets during level
-        }
-      }
+  //     if (!world.running) //this level is over
+  //     {
+  //       if (world.player.alive) //we won!
+  //       {
+  //         if (this.keyboarder.isDown(this.keyboarder.KEYS.N))
+  //         {
+  //           var next_level = world.level + 1;
+  //           if (next_level < game.levels.length) {
+  //             world.score += world.level_score;
+  //             game.reset(world, world.level + 1, world.lives);
+  //           }
+  //           else
+  //             console.log("No more levels!");
+  //         }
+  //         if (this.keyboarder.isDown(this.keyboarder.KEYS.R))
+  //         {
+  //           if (world.level < game.levels.length-1) {
+  //             game.reset(world, world.level, world.lives); //restart level
+  //           } else {
+  //             world.score = 0;
+  //             game.reset(world, 0); //restart game
+  //           }
+  //         }
+  //       }
+  //       else { //we're dead :(
+  //         if (this.keyboarder.isDown(this.keyboarder.KEYS.R)) {
+  //           world.lives--;
+  //           if (world.lives > 0 && world.circles.length > 0) {
+  //             game.reset(world, world.level, world.lives);
+  //           }
+  //           else {
+  //             world.score = 0;
+  //             game.reset(world, 0);
+  //           }
+  //         }
+  //       }
+  //     }
+  //     else {
+  //       if (this.keyboarder.isDown(this.keyboarder.KEYS.R))
+  //       {
+  //         game.reset(world, world.level, world.lives); //allow resets during level
+  //       }
+  //     }
 
-      //switching weapons
-      if (!this.h_pressed && this.keyboarder.isDown(this.keyboarder.KEYS.H)) {
-        this.secondaryWeaponInd++;
-        if (this.secondaryWeaponInd >= world.secondaryWeaponList) {
-          this.secondaryWeaponInd = 0;
-        }
-        this.h_pressed = true;
-      }
-      if (!this.keyboarder.isDown(this.keyboarder.KEYS.H)) {
-        this.h_pressed = false;
-      }
-      if (this.keyboarder.isDown(this.keyboarder.KEYS.ONE) && this.keyboarder.isDown(this.keyboarder.KEYS.SHIFT))
-      {
-        game.reset(world, 0);
-      }
-      if (this.keyboarder.isDown(this.keyboarder.KEYS.TWO) && this.keyboarder.isDown(this.keyboarder.KEYS.SHIFT))
-      {
-        game.reset(world, 1);
-      }
-      if (this.keyboarder.isDown(this.keyboarder.KEYS.THREE) && this.keyboarder.isDown(this.keyboarder.KEYS.SHIFT))
-      {
-        game.reset(world, 2);
-      }
-      if (this.keyboarder.isDown(this.keyboarder.KEYS.FOUR) && this.keyboarder.isDown(this.keyboarder.KEYS.SHIFT))
-      {
-        game.reset(world, 3);
-      }
-      if (this.keyboarder.isDown(this.keyboarder.KEYS.FIVE) && this.keyboarder.isDown(this.keyboarder.KEYS.SHIFT))
-      {
-        game.reset(world, 4);
-      }
-      if (this.keyboarder.isDown(this.keyboarder.KEYS.SIX) && this.keyboarder.isDown(this.keyboarder.KEYS.SHIFT))
-      {
-        game.reset(world, 5);
-      }
-      if (this.keyboarder.isDown(this.keyboarder.KEYS.SEVEN) && this.keyboarder.isDown(this.keyboarder.KEYS.SHIFT))
-      {
-        game.reset(world, 6);
-      }
-      if (this.keyboarder.isDown(this.keyboarder.KEYS.EIGHT) && this.keyboarder.isDown(this.keyboarder.KEYS.SHIFT))
-      {
-        game.reset(world, 7);
-      }
-      if (this.keyboarder.isDown(this.keyboarder.KEYS.NINE) && this.keyboarder.isDown(this.keyboarder.KEYS.SHIFT))
-      {
-        game.reset(world, 8);
-      }
-    },
+  //     //switching weapons
+  //     if (!this.h_pressed && this.keyboarder.isDown(this.keyboarder.KEYS.H)) {
+  //       this.secondaryWeaponInd++;
+  //       if (this.secondaryWeaponInd >= world.secondaryWeaponList) {
+  //         this.secondaryWeaponInd = 0;
+  //       }
+  //       this.h_pressed = true;
+  //     }
+  //     if (!this.keyboarder.isDown(this.keyboarder.KEYS.H)) {
+  //       this.h_pressed = false;
+  //     }
+  //     if (this.keyboarder.isDown(this.keyboarder.KEYS.ONE) && this.keyboarder.isDown(this.keyboarder.KEYS.SHIFT))
+  //     {
+  //       game.reset(world, 0);
+  //     }
+  //     if (this.keyboarder.isDown(this.keyboarder.KEYS.TWO) && this.keyboarder.isDown(this.keyboarder.KEYS.SHIFT))
+  //     {
+  //       game.reset(world, 1);
+  //     }
+  //     if (this.keyboarder.isDown(this.keyboarder.KEYS.THREE) && this.keyboarder.isDown(this.keyboarder.KEYS.SHIFT))
+  //     {
+  //       game.reset(world, 2);
+  //     }
+  //     if (this.keyboarder.isDown(this.keyboarder.KEYS.FOUR) && this.keyboarder.isDown(this.keyboarder.KEYS.SHIFT))
+  //     {
+  //       game.reset(world, 3);
+  //     }
+  //     if (this.keyboarder.isDown(this.keyboarder.KEYS.FIVE) && this.keyboarder.isDown(this.keyboarder.KEYS.SHIFT))
+  //     {
+  //       game.reset(world, 4);
+  //     }
+  //     if (this.keyboarder.isDown(this.keyboarder.KEYS.SIX) && this.keyboarder.isDown(this.keyboarder.KEYS.SHIFT))
+  //     {
+  //       game.reset(world, 5);
+  //     }
+  //     if (this.keyboarder.isDown(this.keyboarder.KEYS.SEVEN) && this.keyboarder.isDown(this.keyboarder.KEYS.SHIFT))
+  //     {
+  //       game.reset(world, 6);
+  //     }
+  //     if (this.keyboarder.isDown(this.keyboarder.KEYS.EIGHT) && this.keyboarder.isDown(this.keyboarder.KEYS.SHIFT))
+  //     {
+  //       game.reset(world, 7);
+  //     }
+  //     if (this.keyboarder.isDown(this.keyboarder.KEYS.NINE) && this.keyboarder.isDown(this.keyboarder.KEYS.SHIFT))
+  //     {
+  //       game.reset(world, 8);
+  //     }
+  //   },
 
-    draw: function(screen) {
-      if (this.alive){
-        screen.fillStyle="#2E2EFE";
-        screen.fillRect(this.center.x - this.size.x / 2, this.center.y - this.size.y / 2,
-                      this.size.x, this.size.y);
-      }
+  //   draw: function(screen) {
+  //     if (this.alive){
+  //       screen.fillStyle="#2E2EFE";
+  //       screen.fillRect(this.center.x - this.size.x / 2, this.center.y - this.size.y / 2,
+  //                     this.size.x, this.size.y);
+  //     }
 
-      if (typeof this.secondaryWeapon.temperature !== 'undefined') {
-        this.secondaryWeaponTemp.center = {x: this.center.x, y: this.center.y-11};
-        this.secondaryWeaponTemp.setPercent(this.secondaryWeapon.temperature / this.secondaryWeapon.heat_capacity)
-        this.secondaryWeaponTemp.draw(screen)
-      }
-    }, 
+  //     if (typeof this.secondaryWeapon.temperature !== 'undefined') {
+  //       this.secondaryWeaponTemp.center = {x: this.center.x, y: this.center.y-11};
+  //       this.secondaryWeaponTemp.setPercent(this.secondaryWeapon.temperature / this.secondaryWeapon.heat_capacity)
+  //       this.secondaryWeaponTemp.draw(screen)
+  //     }
+  //   }, 
 
-    explode: function(world) {
-      for (var i=0; i<20; i++) {
-        // determine velocity of this piece of debris
-        var speed = Math.random() * 1.25 +0.5;
-        var direction = matrix.unitVector({ x: Math.random()*2-1, y: Math.random()*2-1});
-        var velocity = matrix.multiply(direction, speed);
-        var position = { x: this.center.x, y: this.center.y }; //matrix.add(matrix.multiply(direction, this.radius), this.center);
-        var lifespan = Math.random()*300 + 300; //40 - 240 ticks
-        var color = "blue";
-        // console.log("Debris:",i, velocity)
-        world.persistant.push(new game.Debris(this.gameSize, position, velocity, lifespan, color));
-      }
-    }
-  };
+  //   explode: function(world) {
+  //     for (var i=0; i<20; i++) {
+  //       // determine velocity of this piece of debris
+  //       var speed = Math.random() * 1.25 +0.5;
+  //       var direction = matrix.unitVector({ x: Math.random()*2-1, y: Math.random()*2-1});
+  //       var velocity = matrix.multiply(direction, speed);
+  //       var position = { x: this.center.x, y: this.center.y }; //matrix.add(matrix.multiply(direction, this.radius), this.center);
+  //       var lifespan = Math.random()*300 + 300; //40 - 240 ticks
+  //       var color = "blue";
+  //       // console.log("Debris:",i, velocity)
+  //       world.persistant.push(new game.Debris(this.gameSize, position, velocity, lifespan, color));
+  //     }
+  //   }
+  // };
 
   // this is a misc type
   game.Debris = function(dimensions, center, velocity, lifespan, color) {

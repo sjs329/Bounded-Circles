@@ -33,7 +33,7 @@ var Game = (function(game) {
 
 
     // `world` holds the current state of the world.
-    var world = {
+    game.world = {
 
       dimensions: game.dimensions,
       circles: [ ],
@@ -47,7 +47,9 @@ var Game = (function(game) {
       //   new game.Line({ x: 0, y: game.dimensions.y}, {x:game.dimensions.x, y:game.dimensions.y})
       // ],
 
-      player: new game.Player(game.dimensions),
+      // keyboard: new Keyboarder(),
+
+      player: new game.Player(),
 
       projectiles: [],
 
@@ -87,48 +89,48 @@ var Game = (function(game) {
 
     // **tick()** is the main simulation tick function.  It loops forever, running 60ish times a second.
     function tick() {
-      if (!world.init)
+      if (!game.world.init)
       {
-        game.reset(world, 0);
+        game.reset(game.world, 0);
       }
 
       // console.log(Math.random())
       // Update state of circles and lines.
-      game.update(world);
+      game.update(game.world);
 
-      if (!world.player.alive && world.running) {
-        printScoreText(world.score+world.level_score, "black", world);
-        // printMainText("You Lose! :(", "red", world);
-        if (world.lives > 1) {
-          printMainText("Ouch! :(", "red", world);
-          printSubText("(Press 'R' to restart this level)", "black", world);
+      if (!game.world.player.alive && game.world.running) {
+        printScoreText(game.world.score+game.world.level_score, "black", game.world);
+        // printMainText("You Lose! :(", "red", game.world);
+        if (game.world.lives > 1) {
+          printMainText("Ouch! :(", "red", game.world);
+          printSubText("(Press 'R' to restart this level)", "black", game.world);
         }
         else {
-          printMainText("You Lose! :(", "red", world);
-          printSubText("(Press 'R' to restart the game)", "black", world); 
+          printMainText("You Lose! :(", "red", game.world);
+          printSubText("(Press 'R' to restart the game)", "black", game.world); 
         }
-        world.running = false;
+        game.world.running = false;
       }
 
-      if (world.circles.length == 0 && world.running){
-        printScoreText(world.score+world.level_score, "black", world);
+      if (game.world.circles.length == 0 && game.world.running){
+        printScoreText(game.world.score+game.world.level_score, "black", game.world);
         
-        if (world.level == game.levels.length-1) 
+        if (game.world.level == game.levels.length-1) 
         {
-          printMainText("You Win! :)", "blue", world);
-          printSubText("(That was the last level! Press 'R' to restart the game)", "black", world);
+          printMainText("You Win! :)", "blue", game.world);
+          printSubText("(That was the last level! Press 'R' to restart the game)", "black", game.world);
         }
         else
         {
-          printMainText("Level "+(world.level+1)+" defeated! :)", "blue", world);
-          printSubText("(Press 'N' to go to the next level, 'R' to play this one again)", "black", world);
+          printMainText("Level "+(game.world.level+1)+" defeated! :)", "blue", game.world);
+          printSubText("(Press 'N' to go to the next level, 'R' to play this one again)", "black", game.world);
         }
-        world.running = false;
+        game.world.running = false;
       }
       
-      // console.log("Player:",world.player.center)
+      // console.log("Player:",game.world.player.center)
       // Draw circles and lines.
-      game.draw(world, game.screen);
+      game.draw(game.world, game.screen);
 
       // Queue up the next call to tick with the browser.
       if (typeof game.editor_mode === "undefined" || !game.editor_mode) {
@@ -196,7 +198,7 @@ var Game = (function(game) {
     }
 
     // rebuild player
-    world.player = new game.Player(world.dimensions); //game.levels[level].player;
+    world.player = new game.Player(world); //game.levels[level].player;
     world.player.primaryWeapon = new game.levels[level].primaryWeapon(world);
     world.player.secondaryWeapon = new game.levels[level].secondaryWeapon(world);
     world.secondaryWeaponList.push(world.player.secondaryWeapon);

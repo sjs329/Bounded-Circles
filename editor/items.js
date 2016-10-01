@@ -17,6 +17,7 @@ var Editor = (function(editor) {
 		    screen.strokeStyle = "black";
 		    screen.arc(this.center.x, this.center.y, this.private_radius, 0, Math.PI * 2, true);
 		    screen.closePath();
+		    screen.lineWidth = 1.5;
 		    screen.stroke();
 
 		    //inner circle
