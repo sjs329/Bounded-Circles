@@ -32,6 +32,7 @@ var Game = (function (game){
 
         // If `line` is intersecting `circle`, bounce circle off line.
         if (trig.isLineIntersectingCircle(this, line)) {
+        // if (trig.didCircleIntersectLine(this, line)) {
           physics.bounceCircleOffLine(this, line);
         }
       }

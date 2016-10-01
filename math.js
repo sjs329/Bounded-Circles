@@ -69,6 +69,15 @@ var trig = {
     return circleToLineDistance < circle.radius;
   },
 
+  didCircleIntersectLine: function(circle, line) {
+    // console.log(circle)
+    var linePath = { end1: circle.center, end2: matrix.subtract(circle.velocity, circle.center)}
+
+    var intersect = this.getIntersectionPoint(linePath, line)
+
+    return !intersect.failed;
+  },
+
   // **isLineIntersectingCircle()** returns true if `line` is
   // intersecting `circle`.
   isCircleIntersectingCircle: function(circle1, circle2) {
@@ -103,6 +112,7 @@ var trig = {
       point = { 
         x: line1.end1.x + (t * s1.x),
         y: line1.end1.y + (t * s1.y),
+        failed: false
       }
       return point;
     }
