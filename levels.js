@@ -182,12 +182,6 @@ var Game = (function(game) {
           },
         ],
 
-        antiGravityWells: [
-          { center: { x: game.dimensions.x/2-75, y: game.dimensions.y-45 }, direction: { x: -1, y: -2 }, acceleration: 0.1 },
-          { center: { x: game.dimensions.x/2, y: game.dimensions.y-50 }, direction: { x: 0, y: -2 }, acceleration: 0.06 },
-          { center: { x: game.dimensions.x/2+75, y: game.dimensions.y-45 }, direction: { x: 1, y: -2 }, acceleration: 0.1 }
-        ],
-
         num_rand_circles: 0, // these will be created in addition to the ones defined above
 
         primaryWeapon: Pistol,
@@ -442,6 +436,8 @@ var Game = (function(game) {
 
           { pt1: { x: game.dimensions.x/2-180, y: game.dimensions.y-75}, pt2: {x: game.dimensions.x/2-210, y: game.dimensions.y-75} },
           { pt1: { x: game.dimensions.x/2-300, y: game.dimensions.y-75}, pt2: {x: game.dimensions.x/2-330, y: game.dimensions.y-75} },
+          
+          //stairs
           { pt1: { x: 5, y: game.dimensions.y-135}, pt2: {x: 35, y: game.dimensions.y-135} },
           { pt1: { x: 5, y: game.dimensions.y-198}, pt2: {x: 35, y: game.dimensions.y-198} },
           { pt1: { x: 5, y: game.dimensions.y-261}, pt2: {x: 35, y: game.dimensions.y-261} },
@@ -481,6 +477,12 @@ var Game = (function(game) {
             center: { x: game.dimensions.x*4/5, y: game.dimensions.y/8 },
             velocity: { x: -1, y: 1 }
           },
+        ],
+
+
+        // Right side elevator
+        antiGravityWells: [
+          { center: { x: game.dimensions.x-60, y: game.dimensions.y-5 }, direction: { x: 0, y: -2 }, acceleration: 0.06 }
         ],
 
         num_rand_circles: 2,

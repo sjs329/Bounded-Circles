@@ -559,6 +559,7 @@ var Game = (function (game){
     this.center = args.center;
     this.direction = matrix.unitVector(args.direction);
     this.acceleration = matrix.multiply(this.direction, args.acceleration);
+    this.accel_mag = matrix.magnitude(this.acceleration);
     this.particleProbability = 1-args.acceleration;
     this.type = "AntiGravityWell";
     this.exists = true;
@@ -571,7 +572,7 @@ var Game = (function (game){
   game.AntiGravityWell.prototype = {
     emitParticle: function(world) {
       var center = matrix.add(matrix.multiply(matrix.vectorBetween(this.end1, this.end2), Math.random()), this.end1);
-      var particle = new game.AntiGravityParticle({ center: center, direction: this.direction })
+      var particle = new game.AntiGravityParticle({ center: center, direction: this.direction, acceleration: this.acceleration})
       world.misc.push(particle)
     },
 
@@ -598,8 +599,8 @@ var Game = (function (game){
       for (var i=0; i<this.capturedObjects.length; i++) {
         var object = this.capturedObjects[i];
         if (!this.objectInWell(object)) {
-          object.gravity.x = object.default_gravity.x; //this.capturedObjects[i].originalGravity.x;
-          object.gravity.y = object.default_gravity.y; //this.capturedObjects[i].originalGravity.y;
+          object.gravity.x = object.default_gravity.x;
+          object.gravity.y = object.default_gravity.y;
         }
       }
 
@@ -640,10 +641,9 @@ var Game = (function (game){
   game.AntiGravityParticle = function(args) {
     this.center = args.center;
     this.direction = matrix.unitVector(args.direction);
-    var speed = Math.random() * 0.6 +0.4;
-    this.velocity = matrix.multiply(this.direction, speed);
-    // this.gravity {x: 0.0, y: = 0.0};
-    this.size = { x: 1.5, y: 1.5 }
+    this.velocity = {x:0, y:0};
+    this.gravity = args.acceleration;
+    this.size = { x: 2, y: 2 }
     this.type = "AntiGravityParticle"
     this.exists = true;
     this.floor = 10000;
@@ -654,10 +654,7 @@ var Game = (function (game){
       var velocityVariance = 0.0085
       var variance = matrix.multiply(matrix.unitNormal(this.direction), Math.random()*velocityVariance-velocityVariance/2);
       this.velocity = matrix.add(this.velocity, variance)
-      // this.velocity.x *= 1 + (Math.random()*velocityVariance - velocityVariance/2);
-      // this.velocity.y *= 1 + (Math.random()*velocityVariance - velocityVariance/2);
-
-    }, //nothing to update
+    },
 
     draw: function(screen) {
       screen.fillStyle="blue";
