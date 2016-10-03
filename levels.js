@@ -495,7 +495,86 @@ var Game = (function(game) {
         powerups: [FlameThrower, NewLife],
         powerup_probs: [99, 1]
       }),
-      //-------- END LEVEL 5 ---------//
+      //-------- END LEVEL 6 ---------//
+
+      //-----------------//
+      //---- LEVEL 7 ----//
+      //-----------------//
+      new Level(
+      {
+        circles: [
+          {
+            gameSize: game.dimensions,
+            center: { x: 12, y: 11.1875 },
+            velocity: { x: 1, y: 0} 
+          },
+          {
+            gameSize: game.dimensions,
+            center: { x: 78, y: 27.1875 },
+            velocity: { x: -0.76, y: 1.4}
+          },
+          {
+            gameSize: game.dimensions,
+            center: { x: 34, y: 56.1875 },
+            velocity: { x: 0, y: 0}
+          },
+          {
+            gameSize: game.dimensions,
+            center: { x: 721, y: 25.1875 },
+            velocity: { x: 1.1, y: -0.5}
+          },
+          {
+            gameSize: game.dimensions,
+            center: { x: 731, y: 71.1875 },
+            velocity: { x: -0.9, y: -0.3}
+          },
+          {
+            gameSize: game.dimensions,
+            center: { x: 775, y: 14.1875 },
+            velocity: { x: 1.1, y: 0.9}
+          }
+        ],
+
+        lines: [
+        //outer border
+          { pt1: { x: 0, y: 0 }, pt2: { x: 0, y: game.screen.canvas.height } },
+          { pt1: { x: 0, y: game.screen.canvas.height }, pt2: { x: game.screen.canvas.width, y: game.screen.canvas.height } },
+          { pt1: { x: game.screen.canvas.width, y: game.screen.canvas.height }, pt2: { x: game.screen.canvas.width, y: 0 } },
+          { pt1: { x: game.screen.canvas.width, y: 0 }, pt2: { x: 0, y: 0 } },
+
+          //line above weapon info text
+          { pt1: { x: 0, y: game.dimensions.y}, pt2: {x:game.dimensions.x, y:game.dimensions.y} },
+
+          // circle boxes
+          { pt1: { x: 100, y: 0 }, pt2: { x: 100, y: 100} },
+          { pt1: { x: 100, y: 100 }, pt2: { x: 0, y: 100} },
+          { pt1: { x: 700, y: 0 }, pt2: { x: 700, y: 100} },
+          { pt1: { x: 700, y: 100 }, pt2: { x: 800, y: 100} }
+        ],
+
+        antiGravityWells: [
+          { 
+            center: { x: 45, y: 400},
+            direction: { x: 0, y: -1},
+            acceleration: 0.04
+          },
+          {
+            center: { x: 745, y: 400 },
+            direction: { x: 0, y: -1},
+            acceleration: 0.04
+          }
+        ],
+        primaryWeapon: FlameThrower,
+        secondaryWeapon: FlameThrower,
+        powerup_drop_prob: 0.75,
+        powerups: [FlameThrower],
+        powerup_probs: [10],
+
+        num_rand_circles: 0,
+
+        secretWeapon: MultiMissileLauncher,
+      }),
+      //-------- END LEVEL 7 ---------//
     ];
   }
   return game;
