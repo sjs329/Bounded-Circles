@@ -195,6 +195,48 @@ var Game = (function(game) {
       //-------- END LEVEL 0 ---------//
 
       //-----------------//
+      //---- LEVEL 0.5 ----//
+      //-----------------//
+      new Level( 
+      {
+        // Set up the border lines.
+        lines: [
+          //outer border
+          { pt1: { x: 0, y: 0 }, pt2: { x: 0, y: game.screen.canvas.height } },
+          { pt1: { x: 0, y: game.screen.canvas.height }, pt2: { x: game.screen.canvas.width, y: game.screen.canvas.height } },
+          { pt1: { x: game.screen.canvas.width, y: game.screen.canvas.height }, pt2: { x: game.screen.canvas.width, y: 0 } },
+          { pt1: { x: game.screen.canvas.width, y: 0 }, pt2: { x: 0, y: 0 } },
+
+          //line above weapon info text
+          { pt1: { x: 0, y: game.dimensions.y}, pt2: {x:game.dimensions.x, y:game.dimensions.y} },
+        ],
+
+        circles: [
+          {
+            gameSize: game.dimensions,
+            center: { x: game.dimensions.x/2+40, y: game.dimensions.y/3+5 },
+            velocity: { x: -2, y: 0 }
+          },
+          {
+            gameSize: game.dimensions,
+            center: { x: game.dimensions.x/2-40, y: game.dimensions.y/3-1 },
+            velocity: { x: 2, y: 0 }
+          },
+        ],
+
+        num_rand_circles: 0, // these will be created in addition to the ones defined above
+
+        primaryWeapon: Pistol,
+        secondaryWeapon: SMG,
+        secretWeapon: FlameThrower,
+
+        powerup_drop_prob: 0.7,
+        powerups: [SMG, MissileLauncher],
+        powerup_probs: [60, 40]
+      }),
+      //-------- END LEVEL 0.5 ---------//
+
+      //-----------------//
       //---- LEVEL 1 ----//
       //-----------------//
       new Level(

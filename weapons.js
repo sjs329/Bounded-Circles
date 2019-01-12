@@ -127,7 +127,7 @@ function FlameThrower(world) {
 };
 
 function ShieldGun(world) {
-  return new Weapon(Shield, 300, 0, "Shield", "blue", "C", world);
+  return new Weapon(Shield, 300, 100, "Shield", "blue", "C", world);
 };
 
 function NewLife(world) {
@@ -323,7 +323,7 @@ var Shield = function(center, velocity) {
     var angle2 = angle-this.deltaAngle;
     var pt2 = {x: this.center.x+Math.cos(angle2)*this.radius, y: this.center.y+Math.sin(angle2)*this.radius};
     var line = new Line({pt1: pt1, pt2: pt2});
-    line.color = "#58ACFA";
+    line.color = "#0824FF";
     line.lifespan = this.lifespan;
     shieldLines.push(line);
     angle = angle2;

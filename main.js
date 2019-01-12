@@ -354,13 +354,36 @@ var Game = (function(game) {
     world.primaryReloadBar.setPercent((world.time - world.player.primaryWeapon.last_fired)/world.player.primaryWeapon.reload_time);
     world.secondaryWeaponText.setText("Secondary Weapon: "+world.player.secondaryWeapon.name+"\nRounds Remaining: "+(world.player.secondaryWeapon.capacity > 0 ? world.player.secondaryWeapon.rounds_remaining : "Infinite")+"\nReload Time:");
     world.secondaryReloadBar.setPercent((world.time - world.player.secondaryWeapon.last_fired)/world.player.secondaryWeapon.reload_time);
-    world.shieldReloadBar.setPercent((world.time - world.player.shield.last_fired)/world.player.shield.reload_time);
     world.scoreText.setText((world.score+world.level_score).toFixed(0));
     world.scoreMultiplier.setText(world.kill_multiplier.toFixed(0));
     if (world.kill_multiplier > 1)
       world.scoreMultiplierBar.setPercent((300-world.time%300)/300);
     else
       world.scoreMultiplierBar.setPercent(1);
+
+    // Update shield status bar
+    time_since_shield = world.time - world.player.shield.last_fired;
+   
+    if (time_since_shield < world.player.shield.capacity)
+    {
+      world.shieldReloadBar.setColor("#0824FF");
+      // console.log("Decreasing")
+      // Shield active, turn bar dark blue and decrease precentage
+      world.shieldReloadBar.setPercent((world.player.shield.capacity - time_since_shield)/world.player.shield.capacity);  
+    }
+    else
+    {
+      world.shieldReloadBar.setColor("#58ACFA");
+      //Shield expired, increase percentage to fill back up
+      reload_time = world.player.shield.reload_time - world.player.shield.capacity;
+      // console.log("increasing",reload_time, time_since_shield)
+      world.shieldReloadBar.setPercent((time_since_shield-world.player.shield.capacity)/reload_time);  
+    }
+
+    if (world.shieldReloadBar.percent >= 1.0)
+    {
+      world.shieldReloadBar.setColor("#0824FF");
+    }
 
 
     // Update kill multiplier
