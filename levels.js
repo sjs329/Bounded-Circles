@@ -715,6 +715,82 @@ var Game = (function(game) {
         secretWeapon: MultiMissileLauncher,
       }),
       //-------- END LEVEL 7 ---------//
+
+      //-----------------//
+      //---- LEVEL 8 ----//
+      //-----------------//
+      new Level(
+      {
+        circles: [
+          {
+            gameSize: game.dimensions,
+            center: {x: 590, y: 330},
+            velocity: {x: -1.5, y: -2.3},
+          },
+          {
+            gameSize: game.dimensions,
+            center: {x: 135, y: 250},
+            velocity: {x: 4.2, y: -4.1},
+          },
+          {
+            gameSize: game.dimensions,
+            center: {x: 700, y: 130},
+            velocity: {x: -4.1, y: -3},
+          },
+        ],
+
+        lines: [
+        //outer border
+          { pt1: { x: 0, y: 0 }, pt2: { x: 0, y: game.screen.canvas.height } },
+          { pt1: { x: 0, y: game.screen.canvas.height }, pt2: { x: game.screen.canvas.width, y: game.screen.canvas.height } },
+          { pt1: { x: game.screen.canvas.width, y: game.screen.canvas.height }, pt2: { x: game.screen.canvas.width, y: 0 } },
+          { pt1: { x: game.screen.canvas.width, y: 0 }, pt2: { x: 0, y: 0 } },
+
+          //line above weapon info text
+          { pt1: { x: 0, y: game.dimensions.y}, pt2: {x:game.dimensions.x, y:game.dimensions.y} },
+
+          // Line blocking circles
+          { pt1: { x: 0, y: 395 }, pt2: { x: 800, y: 395} },
+        ],
+
+        antiGravityWells: [
+          {
+            center: { x: 790, y: 360},
+            direction: { x: -1, y: 0},
+            acceleration: 0.2
+          },
+          {
+            center: { x: 10, y: 290},
+            direction: { x: 1, y: 0},
+            acceleration: 0.2
+          },
+          {
+            center: { x: 790, y: 210},
+            direction: { x: -1, y: 0},
+            acceleration: 0.2
+          },
+          {
+            center: { x: 10, y: 150},
+            direction: { x: 1, y: 0},
+            acceleration: 0.2
+          },
+          {
+            center: { x: 790, y: 50},
+            direction: { x: -1, y: 0},
+            acceleration: 0.2
+          } 
+        ],
+        primaryWeapon: Pistol,
+        secondaryWeapon: MissileLauncher,
+        powerup_drop_prob: 0.8,
+        powerups: [SMG, FlameThrower, MissileLauncher, MultiMissileLauncher, GatlingGun, NewLife],
+        powerup_probs: [10, 10, 10, 10, 10, 10],
+
+        num_rand_circles: 0,
+
+        secretWeapon: MultiMissileLauncher,
+      }),
+      //-------- END LEVEL 8 ---------//
     ];
   }
   return game;
