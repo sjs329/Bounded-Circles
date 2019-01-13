@@ -148,6 +148,7 @@ var Game = (function (game){
 
     // Sounds
     this.death_sound = new sound("audio/death_sound.mp3")
+    // this.weapon_change_sound = new sound("audio/weapon_change.mp3")
   };
 
   game.Player.prototype = {
@@ -285,8 +286,13 @@ var Game = (function (game){
       //switching weapons
       if (!this.h_pressed && this.keyboarder.isDown(this.keyboarder.KEYS.H)) {
         this.secondaryWeaponInd++;
-        if (this.secondaryWeaponInd >= world.secondaryWeaponList) {
+        if (this.secondaryWeaponInd >= world.secondaryWeaponList.length) {
           this.secondaryWeaponInd = 0;
+        }
+        if (world.secondaryWeaponList.length > 1)
+        {
+          weapon_change_sound = new sound("audio/weapon_change.mp3")
+          weapon_change_sound.play()
         }
         this.h_pressed = true;
       }
