@@ -444,7 +444,10 @@ var Game = (function (game){
 
     draw_int: function(screen) {
       screen.beginPath();
-      screen.arc(this.center.x, this.center.y, this.radius, 0, Math.PI*2, false);
+      screen.moveTo(this.center.x, this.center.y)
+      // screen.arc(this.center.x, this.center.y, this.radius, 0, (this.lifespan-this.age) / this.lifespan * Math.PI*2, false);
+      // screen.arc(this.center.x, this.center.y, this.radius, -Math.PI/2, (this.lifespan-this.age) / this.lifespan * 1.5*Math.PI, false);
+      screen.arc(this.center.x, this.center.y, this.radius, -Math.PI/2, ((this.lifespan-this.age)/this.lifespan*2*Math.PI)-(Math.PI/2), false);
       screen.closePath();
       screen.fillStyle = this.weaponProto.color;
       screen.fill();

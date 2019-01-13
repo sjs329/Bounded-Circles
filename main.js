@@ -225,7 +225,7 @@ var Game = (function(game) {
                                      0,
                                      {style: "15px Courier", align: "left", color: "black"} )
     world.scoreText = new game.Text("",
-                                     {x: game.dimensions.x-5, y: 15},
+                                     {x: game.dimensions.x-55, y: 15},
                                      0,
                                      {style: "15px Courier", align: "right", color: "black"} )
     world.livesLabel = new game.Text("Lives:",
@@ -233,10 +233,10 @@ var Game = (function(game) {
                                      0,
                                      {style: "15px Courier", align: "left", color: "black"} )
     world.scoreMultiplier = new game.Text("1000",
-                                     {x: game.dimensions.x-25, y: 45},
+                                     {x: game.dimensions.x-25, y: 15},
                                      0,
                                      {style: "15px Courier", align: "right", color: "black"} )
-    world.scoreMultiplierBar = new game.FillBar({x: game.dimensions.x-13, y: 40}, {x: 15, y: 7}, "magenta", 0.0, false);
+    world.scoreMultiplierBar = new game.FillBar({x: game.dimensions.x-13, y: 10}, {x: 15, y: 7}, "magenta", 0.0, false);
     world.misc.push(world.primaryWeaponText);
     world.misc.push(world.primaryReloadBar);
     world.misc.push(world.secondaryWeaponText);
@@ -355,7 +355,7 @@ var Game = (function(game) {
     world.secondaryWeaponText.setText("Secondary Weapon: "+world.player.secondaryWeapon.name+"\nRounds Remaining: "+(world.player.secondaryWeapon.capacity > 0 ? world.player.secondaryWeapon.rounds_remaining : "Infinite")+"\nReload Time:");
     world.secondaryReloadBar.setPercent((world.time - world.player.secondaryWeapon.last_fired)/world.player.secondaryWeapon.reload_time);
     world.scoreText.setText((world.score+world.level_score).toFixed(0));
-    world.scoreMultiplier.setText(world.kill_multiplier.toFixed(0));
+    world.scoreMultiplier.setText("x"+world.kill_multiplier.toFixed(0));
     if (world.kill_multiplier > 1)
       world.scoreMultiplierBar.setPercent((300-world.time%300)/300);
     else
