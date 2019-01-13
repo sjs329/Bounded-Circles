@@ -143,6 +143,9 @@ var Game = (function (game){
     this.secretWeapon = FlameThrower();
     this.secretWeapon.capacity = 0;
     this.shield = ShieldGun();
+
+    // Sounds
+    this.death_sound = new sound("audio/death_sound.mp3")
   };
 
   game.Player.prototype = {
@@ -154,6 +157,7 @@ var Game = (function (game){
           if (trig.distance(this.center, world.circles[i].center) <= (world.circles[i].radius+this.size.x/2)) {
             this.alive = false; //we're dead!
             this.explode(world);
+            this.death_sound.play()
             if (typeof this.secondaryWeapon.temperature !== 'undefined')
               this.secondaryWeapon.temperature = 0; //make sure the temp bar goes away
 
