@@ -17,12 +17,14 @@ var Game = (function (game){
     this.default_gravity = {x: 0.0, y: 0.06};
     this.air_resist = 0.0002;
     this.floor = 100000; //larger number so that the circle is allowed to intersect the floor. this is how we detect collisions
+    this.pop_sound = new sound("audio/circle_pop.mp3")
   };
 
   game.Circle.prototype = {
     update: function(world) {
       if (this.health <= 0) {
         this.explode(world);
+        this.pop_sound.play()
         this.exists = false;
         world.level_score += world.kill_multiplier;
         return; //don't need to check for bounces
