@@ -1,6 +1,6 @@
 
 // Generic (meta) weapons. Actual weapons are defined below
-var Weapon = function(bullet, reload_time, capacity, name, color, symbol, world) {
+var Weapon = function(bullet, reload_time, capacity, name, color, symbol, sound_file, world) {
   this.reload_time = reload_time;
   this.bullet = bullet;
   this.capacity = capacity;
@@ -9,32 +9,31 @@ var Weapon = function(bullet, reload_time, capacity, name, color, symbol, world)
   this.symbol = symbol; // a character to print on the powerup
   this.last_fired = -this.reload_time;
   this.rounds_remaining = this.capacity;  // Note that it's possible to have rounds_remaining > capacity since picking up the same gun adds ammo
+  this.sound_file = sound_file
 };
 
 Weapon.prototype = {
   fire: function(center, velocity, world) {
-    //console.log("Firing", this.name)
+    (new sound(this.sound_file)).play();
+    this.last_fired = world.time;
     if (this.name == "Shield"){
       console.log("Making shield")
       world.lines = world.lines.concat(new this.bullet(center, velocity));
-      this.last_fired = world.time;
       return;
     }
     if (this.capacity == 0 || this.rounds_remaining > 0){
       world.projectiles = world.projectiles.concat(new this.bullet(center, velocity));
-      this.last_fired = world.time;
       this.rounds_remaining--;
     }
     else
     {
       world.projectiles = world.projectiles.concat(new Blank(center, velocity));
-      this.last_fired = world.time;
     }
   }
 };
 
 // Special weapon.
-var OverheatableWeapon = function(bullet, reload_time, capacity, heat_capacity, cooling_per_tick, name, color, symbol, world) {
+var OverheatableWeapon = function(bullet, reload_time, capacity, heat_capacity, cooling_per_tick, name, color, symbol, sound_file, world) {
   this.reload_time = reload_time;
   this.bullet = bullet;
   this.capacity = capacity;
@@ -49,12 +48,14 @@ var OverheatableWeapon = function(bullet, reload_time, capacity, heat_capacity, 
   this.rounds_remaining = this.capacity;  // Note that it's possible to have rounds_remaining > capacity since picking up the same gun adds ammo
   this.exists = true; // needed so it doesn't get filtered out of the world by world.stillExists
   this.center = { x: 1, y: 1 }; // needed so it doesn't get filtered out of the world by world.stillOnCanvas
+  this.sound_file = sound_file
   world.misc.push(this); //make sure to add any updateable weapons to misc.
 };
 
 OverheatableWeapon.prototype = {
   fire: function(center, velocity, world) {
     if ((this.capacity == 0 || this.rounds_remaining > 0) && this.temperature < this.heat_capacity){
+      (new sound(this.sound_file)).play()
       new_bullet = new this.bullet(center, velocity);
       world.projectiles = world.projectiles.concat(new_bullet);
       this.last_fired = world.time;
@@ -63,10 +64,9 @@ OverheatableWeapon.prototype = {
     }
     else
     {
+      (new sound("audio/blank.mp3")).play()
       world.projectiles = world.projectiles.concat(new Blank(center, velocity));
       this.last_fired = world.time;
-      
-
     }
   },
 
@@ -99,39 +99,39 @@ OverheatableWeapon.prototype = {
 ///*******************///
 // Fishes shoot blanks.... duh
 function Fish(world) {
-  return new Weapon(Blank, 10, 0, "Blanks", "silver", "-", world);
+  return new Weapon(Blank, 10, 0, "Blanks", "silver", "-", "audio/blank.mp3", world);
 };
 
 function Pistol(world) {
-  return new Weapon(Bullet, 10, 0, "Pistol", "purple", "P", world);
+  return new Weapon(Bullet, 10, 0, "Pistol", "purple", "P", "audio/pistol.mp3", world);
 };
 
 function SMG(world) {
-  return new Weapon(Bullet, 5, 150, "SMG", "gray", "S", world);
+  return new Weapon(Bullet, 5, 150, "SMG", "gray", "S", "audio/pistol.mp3", world);
 };
 
 function GatlingGun(world) {
-  return new OverheatableWeapon(FastBullet, 2 , 300, 550, 0.75, "Gatling Gun", "yellow", "G", world);
+  return new OverheatableWeapon(FastBullet, 2 , 300, 550, 0.75, "Gatling Gun", "yellow", "G", "audio/pistol.mp3", world);
 };
 
 function MissileLauncher(world) {
-  return new Weapon(Missile, 20, 10, "Missile Launcher", "#00FFBF", "M", world);
+  return new Weapon(Missile, 20, 10, "Missile Launcher", "#00FFBF", "M", "audio/pistol.mp3", world);
 };
 
 function MultiMissileLauncher(world) {
-  return new Weapon(MultiMissile, 40, 5, "Multi-Missile", "orange", "Q", world);
+  return new Weapon(MultiMissile, 40, 5, "Multi-Missile", "orange", "Q", "audio/pistol.mp3", world);
 };
 
 function FlameThrower(world) {
-  return new Weapon(Flame, 3, 75, "Flamethrower", "red", "F", world);
+  return new Weapon(Flame, 3, 75, "Flamethrower", "red", "F", "audio/pistol.mp3", world);
 };
 
 function ShieldGun(world) {
-  return new Weapon(Shield, 300, 100, "Shield", "blue", "C", world);
+  return new Weapon(Shield, 300, 100, "Shield", "blue", "C", "audio/pistol.mp3", world);
 };
 
 function NewLife(world) {
-  return new Weapon(Blank, 0, 0, "Life", "pink", "1", world);
+  return new Weapon(Blank, 0, 0, "Life", "pink", "1", "audio/blank.mp3", world);
 };
 
 ///***********************///

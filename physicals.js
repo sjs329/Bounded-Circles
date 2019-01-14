@@ -17,14 +17,15 @@ var Game = (function (game){
     this.default_gravity = {x: 0.0, y: 0.06};
     this.air_resist = 0.0002;
     this.floor = 100000; //larger number so that the circle is allowed to intersect the floor. this is how we detect collisions
-    this.pop_sound = new sound("audio/circle_pop.mp3")
+    // this.pop_sound = new sound("audio/circle_pop.mp3")
   };
 
   game.Circle.prototype = {
     update: function(world) {
       if (this.health <= 0) {
         this.explode(world);
-        this.pop_sound.play()
+        (new sound("audio/circle_pop.mp3")).play() //create a new instance each time so they can re-start immediately
+        // this.pop_sound.play()
         this.exists = false;
         world.level_score += world.kill_multiplier;
         return; //don't need to check for bounces
@@ -146,9 +147,8 @@ var Game = (function (game){
     this.secretWeapon.capacity = 0;
     this.shield = ShieldGun();
 
-    // Sounds
+    // Sounds (that don't need to be played simultaneously)
     this.death_sound = new sound("audio/death_sound.mp3")
-    // this.weapon_change_sound = new sound("audio/weapon_change.mp3")
   };
 
   game.Player.prototype = {
@@ -291,8 +291,7 @@ var Game = (function (game){
         }
         if (world.secondaryWeaponList.length > 1)
         {
-          weapon_change_sound = new sound("audio/weapon_change.mp3")
-          weapon_change_sound.play()
+          (new sound("audio/weapon_change.mp3")).play() //create new instance to allow cutting off previous play
         }
         this.h_pressed = true;
       }
