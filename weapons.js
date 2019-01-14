@@ -128,11 +128,11 @@ function GatlingGun(world) {
 };
 
 function MissileLauncher(world) {
-  return new Weapon(Missile, 20, 10, "Missile Launcher", "#00FFBF", "M", ["audio/pistol.mp3"], world);
+  return new Weapon(Missile, 20, 10, "Missile Launcher", "#00FFBF", "M", ["audio/rocket.mp3"], world);
 };
 
 function MultiMissileLauncher(world) {
-  return new Weapon(MultiMissile, 40, 5, "Multi-Missile", "orange", "Q", ["audio/pistol.mp3"], world);
+  return new Weapon(MultiMissile, 40, 5, "Multi-Missile", "orange", "Q", ["audio/rocket.mp3"], world);
 };
 
 function FlameThrower(world) {
